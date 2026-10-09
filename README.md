@@ -6,7 +6,9 @@ A runnable portfolio reference: synthetic transaction generation → shared stre
 
 ## Online demo and evidence
 
-[Open the hosted browser demo](https://sentinel-fraud-demo-girish.amneal-9162.chatgpt.site) — **private; authorized access required**. It stays hosted independently of the local computer. This browser demo runs exported model inference and stores demo history locally in the browser. The full Python/Kafka platform below runs separately through Docker.
+**Personal hosting migration pending.** The browser demo source is in `hosted-demo/`. It runs exported model inference and stores demo history locally in the browser. The full Python/Kafka platform below runs separately through Docker. A personal demo URL will be added after hosting and visibility are selected.
+
+Project contact: [jillvekariya.10@gmail.com](mailto:jillvekariya.10@gmail.com). [GitHub repository](https://github.com/Jill-Vekariya/sentinel-fraud-platform).
 
 | Evidence | Recorded result | Scope |
 |---|---|---|

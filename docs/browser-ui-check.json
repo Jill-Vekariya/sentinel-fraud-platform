@@ -1,0 +1,7 @@
+{
+  "scoring": true,
+  "feedback": true,
+  "simulation_count": 30,
+  "browser_storage": true,
+  "visual_rendering_verified": false
+}

@@ -1,0 +1,13 @@
+{
+  "name": "sentinel-fraud-dashboard-tests",
+  "private": true,
+  "scripts": {
+    "test:dashboard": "node tests/dashboard.integration.cjs"
+  },
+  "devDependencies": {
+    "jsdom": "30.1.2"
+  },
+  "engines": {
+    "node": ">=22.12"
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "connection": true,
+  "model_display": true,
+  "scoring": true,
+  "recent_decisions": true,
+  "feedback": true,
+  "js_errors": [],
+  "visual_rendering_verified": false
+}

@@ -1,0 +1,58 @@
+# Reference single-node deployment. Build/push image and provision model artifacts first.
+# The SQLite reference uses exactly one API replica and one worker, on shared storage.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: {name: fraud-state}
+spec:
+  accessModes: [ReadWriteOnce]
+  resources: {requests: {storage: 10Gi}}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: fraud}
+spec:
+  replicas: 1
+  strategy: {type: Recreate}
+  selector: {matchLabels: {app: fraud}}
+  template:
+    metadata: {labels: {app: fraud}}
+    spec:
+      securityContext: {runAsUser: 10001, runAsGroup: 10001, fsGroup: 10001}
+      initContainers:
+        - name: bootstrap-model
+          image: YOUR_REGISTRY/fraud-platform:1.0.0
+          command: ["sh", "-c", "mkdir -p /app/state/models /app/state/data && (test -f /app/state/models/current.json || python -m fraud.train --promote)"]
+          env: [{name: MODEL_DIR, value: /app/state/models}]
+          volumeMounts: [{name: state, mountPath: /app/state}]
+      containers:
+        - name: api
+          image: YOUR_REGISTRY/fraud-platform:1.0.0
+          ports: [{containerPort: 8000}]
+          env:
+            - name: API_KEY
+              valueFrom: {secretKeyRef: {name: fraud-api-key, key: api-key}}
+          volumeMounts:
+            - {name: state, mountPath: /app/data, subPath: data}
+            - {name: state, mountPath: /app/models, subPath: models}
+          resources: {requests: {cpu: '500m', memory: '512Mi'}, limits: {cpu: '2', memory: '2Gi'}}
+          readinessProbe: {httpGet: {path: /health/ready, port: 8000}, initialDelaySeconds: 5, periodSeconds: 10}
+          livenessProbe: {httpGet: {path: /health/live, port: 8000}, initialDelaySeconds: 10, periodSeconds: 10}
+        - name: worker
+          image: YOUR_REGISTRY/fraud-platform:1.0.0
+          command: ["python", "-m", "fraud.worker"]
+          env:
+            - {name: API_URL, value: 'http://localhost:8000'}
+            - {name: KAFKA_BOOTSTRAP, value: 'YOUR_KAFKA:9092'}
+            - name: API_KEY
+              valueFrom: {secretKeyRef: {name: fraud-api-key, key: api-key}}
+          volumeMounts: [{name: state, mountPath: /app/data, subPath: data}]
+          resources: {requests: {cpu: '100m', memory: '128Mi'}, limits: {cpu: '1', memory: '512Mi'}}
+      volumes: [{name: state, persistentVolumeClaim: {claimName: fraud-state}}]
+---
+apiVersion: v1
+kind: Service
+metadata: {name: fraud}
+spec:
+  type: ClusterIP
+  selector: {app: fraud}
+  ports: [{port: 8000, targetPort: 8000}]

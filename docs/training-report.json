@@ -1,0 +1,45 @@
+{
+  "version": "v1791542146922556830",
+  "features": [
+    "log_amount",
+    "count_5m",
+    "sum_5m",
+    "amount_ratio",
+    "new_device",
+    "foreign",
+    "hour_sin",
+    "hour_cos"
+  ],
+  "threshold": 0.3393955366154643,
+  "validation": {
+    "pr_auc": 0.7439483253417187,
+    "precision": 0.6891891891891891,
+    "recall": 0.6,
+    "false_positive_rate": 0.009935205183585313,
+    "tp": 51,
+    "fp": 23,
+    "tn": 2292,
+    "fn": 34,
+    "n": 2400
+  },
+  "test": {
+    "pr_auc": 0.7425592686524392,
+    "precision": 0.765625,
+    "recall": 0.620253164556962,
+    "false_positive_rate": 0.006462731581214994,
+    "tp": 49,
+    "fp": 15,
+    "tn": 2306,
+    "fn": 30,
+    "n": 2400
+  },
+  "champion_validation": null,
+  "promotion_gate_passed": true,
+  "anomaly_sha256": "771208e38f42d18a7580ee364f1a694444ec6a9b0cc98bf2b9c6e7913efce05d",
+  "classifier_sha256": "f579ea9a751dbe067fa25bf581dc7c7808afdb1c57cd38b868bb8a9cafea9350",
+  "dataset_sha256": "f5f247537091561b53af86cb9029a11c56743028c0405139c5c01895f66c0bf1",
+  "synthetic": true,
+  "seed": 42,
+  "split": "chronological 60/20/20",
+  "note": "Synthetic metrics demonstrate pipeline only; no real-world claims."
+}

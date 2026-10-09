@@ -1,0 +1,13 @@
+{
+  "n": 200,
+  "p50_http_ms": 25.11503549999361,
+  "p95_http_ms": 64.07613085006004,
+  "p99_http_ms": 136.85766853990276,
+  "decisions": {
+    "APPROVE": 145,
+    "REVIEW": 34,
+    "BLOCK": 21
+  },
+  "synthetic": true,
+  "concurrency": 1
+}

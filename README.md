@@ -6,7 +6,7 @@ A runnable portfolio reference: synthetic transaction generation → shared stre
 
 ## Online demo and evidence
 
-The public personal demo runs exported synthetic model inference, exact classifier Tree SHAP, guided scenarios and a real-dataset cost explorer. Its URL is listed here after verified publication. The full Python/Kafka platform runs separately through Docker.
+The public personal demo runs exported synthetic model inference, exact classifier Tree SHAP, guided scenarios and a real-dataset cost explorer. [Open the public demo](https://jill-vekariya.github.io/sentinel-fraud-platform/). The full Python/Kafka platform runs separately through Docker.
 
 Project contact: [jillvekariya.10@gmail.com](mailto:jillvekariya.10@gmail.com). [GitHub repository](https://github.com/Jill-Vekariya/sentinel-fraud-platform).
 

@@ -68,3 +68,7 @@ The GitHub package includes the hosted browser source and reproducible Python mo
 ## Extended portfolio validation
 
 17 Python checks pass, including threshold ties and amount-sensitive cost selection. The full real-data benchmark and protocol are in REAL_BENCHMARK.md. Exact browser classifier explanations matched native XGBoost Tree SHAP on 20 cases within 0.000001 log-odds. The browser interaction check covers guided scenarios, explanation display, threshold changes, cost changes, simulation and feedback; visual rendering remains unverified.
+
+## Public personal deployment
+
+Extended source commit b9757e2 passed [GitHub Actions](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/runs/37932843967), including 17 Python tests, image build, Kafka smoke check, browser score/explanation parity and hosted interactions. [Public deployment](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/runs/37933120841) succeeded. Unauthenticated HTTP checks confirmed the public HTML, synthetic model, 284,807-row/five-approach benchmark report and explanation module load successfully at https://jill-vekariya.github.io/sentinel-fraud-platform/. This public deployment is the browser demo; the Python/Kafka backend remains a separate Docker deployment.

@@ -16,6 +16,18 @@ Each stage sent 100 new transactions with unique accounts. A semaphore limited o
 
 All 300 requests succeeded and returned the correct new transaction ID without a replay marker. A separate 20-request concurrent retry of the same payload returned one new decision and 19 identical replays, with exactly one decision row and one outbox row.
 
+## Repeat from a clean checkout
+
+A second run used a fresh Git clone, new Compose model/data volumes and a separately isolated audit API. All 300 new requests, 20 concurrent retries and 27 security checks passed again. [Full second report](final-checklist-load-security.json); [checkout conditions](FINAL_CHECKLIST.md).
+
+| Concurrent clients | HTTP 200 / requests | Achieved requests/s | p50, ms | p95, ms | p99, ms |
+|---:|---:|---:|---:|---:|---:|
+| 1 | 100 / 100 | 23.57 | 40.13 | 64.24 | 73.43 |
+| 5 | 100 / 100 | 24.97 | 82.85 | 887.02 | 1,795.67 |
+| 10 | 100 / 100 | 35.51 | 59.53 | 1,269.14 | 2,709.34 |
+
+The earlier measurements remain above with their original conditions. Runtime contention and short samples cause variation; neither run is a guaranteed performance target.
+
 These short samples are not a steady-state capacity, soak or availability test. They do not include network distance, Kafka lag, a Redis outage, realistic repeated-account skew or growing production history. The p95 increase under concurrency is consistent with the deliberate single SQLite writer and serialized model scoring; the project makes no guaranteed sub-100 ms claim. Broker/Redis integration was checked separately in [FINAL_VERIFICATION.md](FINAL_VERIFICATION.md).
 
 ## Security results and fixes

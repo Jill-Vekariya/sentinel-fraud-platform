@@ -1,0 +1,131 @@
+{
+  "live_pipeline": {
+    "readiness": true,
+    "authentication": true,
+    "validation": true,
+    "streamed": 20,
+    "decision_outputs": 20,
+    "durable_replay": true,
+    "payload_conflict": true,
+    "feedback": true,
+    "redis_mirror": true,
+    "late_event_dlq": true,
+    "delivered_outbox": true,
+    "monitoring": true,
+    "prometheus": true
+  },
+  "passed": true,
+  "producer_transactions": 20,
+  "repository_scan": {
+    "scope": "Current tracked text files and selected credential signatures only; demo keys are public examples; not a complete secret/vulnerability audit",
+    "tracked_files": 83,
+    "forbidden_runtime_files": [],
+    "high_confidence_credential_matches": []
+  },
+  "load": {
+    "stages": [
+      {
+        "concurrency": 1,
+        "requests": 100,
+        "status_counts": {
+          "200": 100
+        },
+        "duration_seconds": 4.243381178999698,
+        "achieved_requests_per_second": 23.56611291365845,
+        "p50_http_ms": 40.12607499953447,
+        "p95_http_ms": 64.24253095074162,
+        "p99_http_ms": 73.42984011960667
+      },
+      {
+        "concurrency": 5,
+        "requests": 100,
+        "status_counts": {
+          "200": 100
+        },
+        "duration_seconds": 4.005019007001465,
+        "achieved_requests_per_second": 24.96867051696452,
+        "p50_http_ms": 82.84901549995993,
+        "p95_http_ms": 887.0191740488731,
+        "p99_http_ms": 1795.67138909883
+      },
+      {
+        "concurrency": 10,
+        "requests": 100,
+        "status_counts": {
+          "200": 100
+        },
+        "duration_seconds": 2.815739630999815,
+        "achieved_requests_per_second": 35.514647341342396,
+        "p50_http_ms": 59.52841949965659,
+        "p95_http_ms": 1269.1448714006578,
+        "p99_http_ms": 2709.339836900181
+      }
+    ],
+    "requests": 300,
+    "concurrent_replay": {
+      "requests": 20,
+      "new_decisions": 1,
+      "replays": 19,
+      "ledger_rows": 1,
+      "outbox_rows": 1
+    },
+    "security_checks": 27
+  },
+  "clean_checkout": {
+    "path": "C:\\Users\\jillv\\Projects\\Sentinel-Checklist-20261009",
+    "fresh_model_and_data_volumes": true,
+    "initial_local_files": {
+      "env": false,
+      "data": false,
+      "models": false
+    },
+    "separate_compose_project": "sentinelchecklist20261009",
+    "host_port_published": false
+  },
+  "chronological_boundaries": {
+    "train": {
+      "rows": 170882,
+      "fraud": 360,
+      "time_min": 0,
+      "time_max": 120395,
+      "fraud_amount": 40167.619999999995
+    },
+    "validation": {
+      "rows": 56963,
+      "fraud": 57,
+      "time_min": 120396,
+      "time_max": 145247,
+      "fraud_amount": 12231.09
+    },
+    "test": {
+      "rows": 56962,
+      "fraud": 75,
+      "time_min": 145248,
+      "time_max": 172792,
+      "fraud_amount": 7729.26
+    }
+  },
+  "restart": {
+    "passed": true,
+    "persisted_replay": true,
+    "identical_risk_score": true,
+    "decision_rows": 1
+  },
+  "started_at": "2026-10-09T15:49:48.4430673Z",
+  "tests": {
+    "result": "18 passed, 1 warning in 4.07s",
+    "passed": 18
+  },
+  "benchmark": {
+    "passed": true,
+    "dataset_rows": 284807,
+    "models": 5,
+    "numeric_comparisons": 17147,
+    "max_numeric_difference": 6.776263578034403e-21,
+    "tolerance": 1e-8,
+    "dataset_sha256": "76274b691b16a6c49d3f159c883398e03ccd6d1ee12d9d8ee38f4b4b98551a89"
+  },
+  "completed_at": "2026-10-09T15:53:29.7464938Z",
+  "source_commit": "14c4a3fb64e0281e27d94e62db0eab268423ed37",
+  "data_input_note": "Existing excluded raw CSV supplied explicitly, SHA-256 checked; no old environment, model or state reused for setup"
+}

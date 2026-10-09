@@ -1,0 +1,311 @@
+{
+  "passed": true,
+  "recorded_at": "2026-10-09T15:53:27.621800+00:00",
+  "environment": {
+    "python": "3.12.15",
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "visible_cpus": 12
+  },
+  "scope": "Isolated single API, no Redis/Kafka; closed-loop HTTP clients; synthetic unique accounts; not a capacity SLA",
+  "stages": [
+    {
+      "concurrency": 1,
+      "requests": 100,
+      "status_counts": {
+        "200": 100
+      },
+      "duration_seconds": 4.243381178999698,
+      "achieved_requests_per_second": 23.56611291365845,
+      "p50_http_ms": 40.12607499953447,
+      "p95_http_ms": 64.24253095074162,
+      "p99_http_ms": 73.42984011960667
+    },
+    {
+      "concurrency": 5,
+      "requests": 100,
+      "status_counts": {
+        "200": 100
+      },
+      "duration_seconds": 4.005019007001465,
+      "achieved_requests_per_second": 24.96867051696452,
+      "p50_http_ms": 82.84901549995993,
+      "p95_http_ms": 887.0191740488731,
+      "p99_http_ms": 1795.67138909883
+    },
+    {
+      "concurrency": 10,
+      "requests": 100,
+      "status_counts": {
+        "200": 100
+      },
+      "duration_seconds": 2.815739630999815,
+      "achieved_requests_per_second": 35.514647341342396,
+      "p50_http_ms": 59.52841949965659,
+      "p95_http_ms": 1269.1448714006578,
+      "p99_http_ms": 2709.339836900181
+    }
+  ],
+  "concurrent_replay": {
+    "requests": 20,
+    "new_decisions": 1,
+    "replays": 19,
+    "ledger_rows": 1,
+    "outbox_rows": 1
+  },
+  "security_checks": [
+    {
+      "check": "POST score auth missing",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "POST score auth wrong",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "GET decisions auth missing",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "GET decisions auth wrong",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "GET load_c6d852f6c515_replay auth missing",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "GET load_c6d852f6c515_replay auth wrong",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "POST load_c6d852f6c515_replay auth missing",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "POST load_c6d852f6c515_replay auth wrong",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "GET monitor auth missing",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "GET monitor auth wrong",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "GET model auth missing",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "GET model auth wrong",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "GET metrics auth missing",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "GET metrics auth wrong",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "non-ASCII invalid key",
+      "expected_status": 401,
+      "actual_status": 401,
+      "passed": true
+    },
+    {
+      "check": "negative amount",
+      "expected_status": 422,
+      "actual_status": 422,
+      "passed": true
+    },
+    {
+      "check": "excess amount",
+      "expected_status": 422,
+      "actual_status": 422,
+      "passed": true
+    },
+    {
+      "check": "naive timestamp",
+      "expected_status": 422,
+      "actual_status": 422,
+      "passed": true
+    },
+    {
+      "check": "SQL identifier",
+      "expected_status": 422,
+      "actual_status": 422,
+      "passed": true
+    },
+    {
+      "check": "HTML device identifier",
+      "expected_status": 422,
+      "actual_status": 422,
+      "passed": true
+    },
+    {
+      "check": "overflow JSON number",
+      "expected_status": 422,
+      "actual_status": 422,
+      "passed": true
+    },
+    {
+      "check": "malformed JSON",
+      "expected_status": 422,
+      "actual_status": 422,
+      "passed": true
+    },
+    {
+      "check": "SQL lookup remains unknown",
+      "expected_status": 404,
+      "actual_status": 404,
+      "passed": true
+    },
+    {
+      "check": "path traversal does not expose files",
+      "expected_status": 404,
+      "actual_status": 404,
+      "passed": true
+    },
+    {
+      "check": "changed payload conflicts",
+      "expected_status": 409,
+      "actual_status": 409,
+      "passed": true
+    },
+    {
+      "check": "untrusted origin not granted CORS",
+      "passed": true
+    },
+    {
+      "check": "rejected requests do not mutate ledger",
+      "passed": true
+    }
+  ],
+  "recorded_demo": [
+    {
+      "scenario": "normal",
+      "request": {
+        "transaction_id": "load_c6d852f6c515_normal",
+        "account_id": "load_c6d852f6c515_demo_account",
+        "timestamp": "2026-10-09T15:53:27.581501+00:00",
+        "amount": 45,
+        "device_id": "usual",
+        "country": "US",
+        "home_country": "US"
+      },
+      "response": {
+        "risk_score": 0.078391,
+        "fraud_probability": 0.030452,
+        "anomaly_percentile": 0.989227,
+        "decision": "APPROVE",
+        "reason_codes": [],
+        "explanations": [
+          {
+            "feature": "new_device",
+            "contribution_log_odds": 2.6611
+          },
+          {
+            "feature": "amount_ratio",
+            "contribution_log_odds": 0.09116
+          }
+        ],
+        "model_version": "v1791561127089681003",
+        "threshold": 0.3393955366154643,
+        "transaction_id": "load_c6d852f6c515_normal",
+        "replayed": false,
+        "latency_ms": 8.117
+      },
+      "stored_features": {
+        "log_amount": 3.828641396489095,
+        "count_5m": 0,
+        "sum_5m": 0,
+        "amount_ratio": 0.45,
+        "new_device": 1,
+        "foreign": 0,
+        "hour_sin": -0.8503522249955627,
+        "hour_cos": -0.5262139236518698
+      }
+    },
+    {
+      "scenario": "foreign_spike",
+      "request": {
+        "transaction_id": "load_c6d852f6c515_foreign_spike",
+        "account_id": "load_c6d852f6c515_demo_account",
+        "timestamp": "2026-10-09T15:53:27.603095+00:00",
+        "amount": 6000,
+        "device_id": "new",
+        "country": "GB",
+        "home_country": "US"
+      },
+      "response": {
+        "risk_score": 0.918814,
+        "fraud_probability": 0.914541,
+        "anomaly_percentile": 1,
+        "decision": "BLOCK",
+        "reason_codes": [
+          "FOREIGN_AMOUNT_SPIKE"
+        ],
+        "explanations": [
+          {
+            "feature": "log_amount",
+            "contribution_log_odds": 2.38613
+          },
+          {
+            "feature": "new_device",
+            "contribution_log_odds": 2.24038
+          },
+          {
+            "feature": "foreign",
+            "contribution_log_odds": 1.80989
+          }
+        ],
+        "model_version": "v1791561127089681003",
+        "threshold": 0.3393955366154643,
+        "transaction_id": "load_c6d852f6c515_foreign_spike",
+        "replayed": false,
+        "latency_ms": 7.784
+      },
+      "stored_features": {
+        "log_amount": 8.699681400989514,
+        "count_5m": 1,
+        "sum_5m": 3.828641396489095,
+        "amount_ratio": 100,
+        "new_device": 1,
+        "foreign": 1,
+        "hour_sin": -0.8503522249955627,
+        "hour_cos": -0.5262139236518698
+      }
+    }
+  ]
+}

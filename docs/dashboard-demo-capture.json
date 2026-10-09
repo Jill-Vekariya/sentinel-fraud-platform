@@ -1,0 +1,106 @@
+{
+  "format": "Captioned sequence of actual browser screenshots; not a continuous screen recording",
+  "duration_seconds": 60,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "audio": false,
+  "application_url": "https://jill-vekariya.github.io/sentinel-fraud-platform/",
+  "application_source_commit": "3aa476580805b547f0fba417cca3c88ed5e46906",
+  "deployment_run": "https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/runs/37956057385",
+  "screenshots": [
+    {
+      "scene": 1,
+      "capture_file": "sentinel-payment-1791561951390.jpg",
+      "source_sha256": "fb51d01be2293985ce13c9fe6105b08070bf5982556c2913031a6d12133a3a20",
+      "source_dimensions": [
+        1348,
+        926
+      ],
+      "captured_at_unix_ms": 1791561951390
+    },
+    {
+      "scene": 2,
+      "capture_file": "sentinel-spike-1791562010548.jpg",
+      "source_sha256": "20fb7a35517eb35c1a37ce06fe8ad0b79e09d5c6a0c2b60a1d108eb55960407f",
+      "source_dimensions": [
+        1348,
+        926
+      ],
+      "captured_at_unix_ms": 1791562010548
+    },
+    {
+      "scene": 3,
+      "capture_file": "sentinel-explanation-1791562025770.jpg",
+      "source_sha256": "8ce0dc2e332441b5a571243158f116a6f40cdbfb1b5a886e4e37158040ca00a6",
+      "source_dimensions": [
+        1348,
+        926
+      ],
+      "captured_at_unix_ms": 1791562025770
+    },
+    {
+      "scene": 4,
+      "capture_file": "sentinel-benchmark-1791562151189.jpg",
+      "source_sha256": "3481a52eef50680b28c635554222f2a77c724f6247d07e8e22b334254d18f680",
+      "source_dimensions": [
+        1348,
+        926
+      ],
+      "captured_at_unix_ms": 1791562151189
+    },
+    {
+      "scene": 5,
+      "capture_file": "sentinel-cost-change-1791562163521.jpg",
+      "source_sha256": "aa938983febb4963d034a469b57c27f6d061476e20b309117185d3e3f6bbd09b",
+      "source_dimensions": [
+        1348,
+        926
+      ],
+      "captured_at_unix_ms": 1791562163521
+    },
+    {
+      "scene": 6,
+      "capture_file": "sentinel-hosted-scope-1791562292205.jpg",
+      "source_sha256": "6bbe60eed88e32bec55a66cb66365c6c6addfc82a8bfb0a87299637280509bd7",
+      "source_dimensions": [
+        1348,
+        926
+      ],
+      "captured_at_unix_ms": 1791562292205
+    }
+  ],
+  "observed": {
+    "account": "walkthrough_20261009",
+    "normal": {
+      "amount": 45,
+      "country": "US",
+      "risk_display": "0.078",
+      "decision": "APPROVE"
+    },
+    "spike": {
+      "amount": 6000,
+      "country": "GB",
+      "risk_display": "0.919",
+      "decision": "BLOCK",
+      "prior_events_5m": 1
+    },
+    "default_xgboost_cost": {
+      "friction_eur": 5,
+      "threshold_display": "0.03689",
+      "flags": 87,
+      "false_positives": 30,
+      "missed_frauds": 18,
+      "cost_display_eur": 2640
+    },
+    "changed_xgboost_cost": {
+      "friction_eur": 100,
+      "threshold_display": "0.62326",
+      "flags": 45,
+      "false_positives": 2,
+      "missed_frauds": 32,
+      "cost_display_eur": 4026
+    }
+  }
+}

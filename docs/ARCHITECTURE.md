@@ -14,7 +14,7 @@ flowchart TD
   L --> O[Outbox publisher]
   O --> R[Kafka decisions]
   L --> V[Feedback + monitoring]
-  V --> C[Candidate training]
+  V --> C[Curated CSV + training CLI]
   C --> G[Validation gates + explicit promotion]
   G --> M
 ```
@@ -49,4 +49,4 @@ One API process and a shared local SQL file provide a durable reference implemen
 
 Rollback changes the model pointer and affects future decisions after reload. It preserves prior decisions and does not rewind feature history. Candidate training is isolated in a new version directory. The pointer is atomically replaced, with the prior version saved; concurrent trainers/promoters are unsupported.
 
-Prometheus latency includes durable commit and excludes response network transport. Stored `latency_ms` is core work through inference and excludes commit. The demo measures serial client HTTP latency and records its concurrency. A genuine sub-100ms SLO needs sustained concurrent tests, documented hardware, load mix, p95/p99 and fault injection.
+Prometheus latency includes durable commit and excludes response network transport. Stored `latency_ms` is core work through inference and excludes commit. The serial demo and two bounded concurrent runs have separate conditions in [LOAD_SECURITY.md](LOAD_SECURITY.md). At ten clients, measured p95 was 987 ms and 1,269 ms in those runs. A sub-100 ms SLO would require changes supported by sustained workload tests, documented hardware, load mix and fault injection; it is not established here.

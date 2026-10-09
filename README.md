@@ -4,11 +4,21 @@ A runnable portfolio reference: synthetic transaction generation → shared stre
 
 **Status:** portfolio feature set frozen after Docker integration, regression, benchmark reproduction, bounded load and basic security checks. Synthetic data only by default. No claim of production readiness, a 35% false-positive reduction, real fraud capture, or guaranteed sub-100 ms latency. See [release scope and limitations](docs/RELEASE_FREEZE.md).
 
-## Online demo and evidence
+## 🎥 Demo Video
+
+[▶ Watch the Sentinel dashboard demonstration](docs/sentinel-dashboard-demo.mp4)
+
+A captioned walkthrough using captures of the actual public application: scoring, classifier explanations and the real-data cost explorer. [Transcript and capture details](docs/DASHBOARD_DEMO.md). Also available: the [48-second recorded Docker API walkthrough](docs/sentinel-demo.mp4), with [captured-response provenance](docs/DEMO_TRANSCRIPT.md). Videos are hosted in this repository.
+
+## 🌐 Live Demo
 
 The public personal demo runs exported synthetic model inference, exact classifier Tree SHAP, guided scenarios and a real-dataset cost explorer. [Open the public demo](https://jill-vekariya.github.io/sentinel-fraud-platform/). The full Python/Kafka platform runs separately through Docker.
 
-Project contact: [jillvekariya.10@gmail.com](mailto:jillvekariya.10@gmail.com). [GitHub repository](https://github.com/Jill-Vekariya/sentinel-fraud-platform).
+## 💻 Source Code
+
+[View the GitHub repository](https://github.com/Jill-Vekariya/sentinel-fraud-platform). Project contact: [jillvekariya.10@gmail.com](mailto:jillvekariya.10@gmail.com).
+
+## Verification evidence
 
 | Evidence | Recorded result | Scope |
 |---|---|---|
@@ -17,11 +27,11 @@ Project contact: [jillvekariya.10@gmail.com](mailto:jillvekariya.10@gmail.com). 
 | Model holdout | PR-AUC 0.7426; recall 0.6203; FPR 0.6463% | 2,400 synthetic chronological holdout events |
 | Serial HTTP latency | p50 25.12 ms; p95 64.08 ms; p99 136.86 ms | 200 loopback requests, one client |
 | Browser model parity | 200 cases within 0.00001 | Python versus JavaScript synthetic scores |
-| Bounded concurrent load | 300/300 HTTP successes; p95 987 ms at 10 clients | Isolated single API; 100 requests at each of 1, 5 and 10 clients |
+| Bounded concurrent load | 300/300 successes in each of two runs; 10-client p95 987 / 1,269 ms | Isolated single API; 100 requests at each of 1, 5 and 10 clients per run |
 | Basic security checks | 27 passed; two error-handling bugs fixed | Authentication, invalid input, replay conflict and rejected-request persistence |
 | Real benchmark reproduction | 17,147 numeric comparisons passed | 284,807 rows, five approaches; absolute tolerance 1e-8 |
 
-Watch the [48-second captioned API demonstration](docs/sentinel-demo.mp4), with [transcript and captured-response provenance](docs/DEMO_TRANSCRIPT.md). See [final integration verification](docs/FINAL_VERIFICATION.md), [load and security measurements](docs/LOAD_SECURITY.md), [three-minute walkthrough](docs/DEMO_WALKTHROUGH.md), [validation conditions](docs/VALIDATION.md), [architecture](docs/ARCHITECTURE.md), [interview guide](docs/INTERVIEW_GUIDE.md) and [career preparation](docs/CAREER_READINESS.md). The [GitHub Actions workflow](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/workflows/ci.yml) checks Python regressions, Docker image build, Kafka streaming and browser model parity on clean hosted runners.
+The [final checklist](docs/FINAL_CHECKLIST.md) records a fresh Git clone with new model/data volumes: all 18 tests, producer-to-broker processing, durable decisions/output, restart replay, complete benchmark reproduction and a second load/security run passed. See [integration verification](docs/FINAL_VERIFICATION.md), [load and security measurements](docs/LOAD_SECURITY.md), [three-minute walkthrough](docs/DEMO_WALKTHROUGH.md), [validation conditions](docs/VALIDATION.md), [architecture diagram](docs/ARCHITECTURE.md), [ten interview answers](docs/INTERVIEW_GUIDE.md) and [career preparation](docs/CAREER_READINESS.md). The [GitHub Actions workflow](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/workflows/ci.yml) checks Python regressions, Docker image build, Kafka streaming and browser model parity on clean hosted runners.
 
 ## Real data and cost-sensitive decisions
 

@@ -1,6 +1,6 @@
 # Portfolio feature freeze
 
-Frozen on 2026-10-09 after the following six release checks. This is the student portfolio scope, with bug fixes and documentation corrections allowed; no additional platform components are required for this release.
+Frozen on 2026-10-09 after the following six release checks. A later [clean-checkout repeat](FINAL_CHECKLIST.md) reproduced the core results, and a small dashboard input-display bug was fixed and checked. This is the student portfolio scope, with bug fixes and documentation corrections allowed; no additional platform components are required for this release.
 
 | Release step | Completion evidence |
 |---|---|
@@ -20,7 +20,7 @@ Synthetic streaming feature computation, XGBoost/Isolation Forest inference, cos
 ## Remaining limitations
 
 - The public GitHub Pages demo performs browser inference and stores local history. The Python/Kafka platform runs separately in Docker; a publicly hosted, continuously available backend has not been deployed.
-- One API replica, one SQLite writer and serialized scoring limit concurrency. The bounded load run reached p95 987 ms at ten clients. There is no sustained throughput, availability or low-latency SLA.
+- One API replica, one SQLite writer and serialized scoring limit concurrency. Two bounded load runs reached p95 987 ms and 1,269 ms at ten clients. There is no sustained throughput, availability or low-latency SLA.
 - Kafka output is at least once. Consumers must deduplicate transaction IDs. Restart replay checks do not prove end-to-end exactly-once delivery; crash injection, host reboot and multi-replica behavior remain untested.
 - The serving model learns synthetic data. The separate real benchmark uses supplied anonymized PCA features and one chronological split from two days in 2013, with only 75 holdout frauds. It does not validate the synthetic model on real transactions or establish future generalization.
 - Scores are uncalibrated. Threshold cost assumptions include perfect interception and hypothetical friction/review costs; measured benchmark savings are not realized business savings. Review-only labels and immature labels can bias retraining.

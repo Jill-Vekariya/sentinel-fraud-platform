@@ -2,6 +2,8 @@
 
 Executed on 2026-10-09 on Windows with Docker Desktop/WSL2, Python 3.12.15 and CPU XGBoost 3.0.0. These are bounded portfolio checks, including a short concurrent HTTP workload; they do not establish production certification or a capacity SLA.
 
+A later [fresh-checkout checklist](FINAL_CHECKLIST.md) repeated startup with new model/data volumes, all 18 tests, standard producer and full broker audits, restart replay, benchmark reproduction, 300 successful load requests and 27 security checks. The repeat run measured 10-client p95 1,269 ms; the original run below measured 987 ms. Both are retained with their conditions.
+
 | Check | Evidence |
 |---|---|
 | Complete Compose startup | `docker compose up --build -d` succeeded; API, broker and Redis healthy, worker running |

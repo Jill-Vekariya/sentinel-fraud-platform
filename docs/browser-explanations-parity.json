@@ -1,0 +1,6 @@
+{
+  "cases": 20,
+  "max_log_odds_difference": 9.482887546319319e-07,
+  "tolerance": 1e-05,
+  "passed": true
+}

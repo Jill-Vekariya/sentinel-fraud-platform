@@ -6,7 +6,7 @@ A runnable portfolio reference: synthetic transaction generation → shared stre
 
 ## Online demo and evidence
 
-**Personal hosting migration pending.** The browser demo source is in `hosted-demo/`. It runs exported model inference and stores demo history locally in the browser. The full Python/Kafka platform below runs separately through Docker. A personal demo URL will be added after hosting and visibility are selected.
+The public personal demo runs exported synthetic model inference, exact classifier Tree SHAP, guided scenarios and a real-dataset cost explorer. Its URL is listed here after verified publication. The full Python/Kafka platform runs separately through Docker.
 
 Project contact: [jillvekariya.10@gmail.com](mailto:jillvekariya.10@gmail.com). [GitHub repository](https://github.com/Jill-Vekariya/sentinel-fraud-platform).
 
@@ -19,6 +19,10 @@ Project contact: [jillvekariya.10@gmail.com](mailto:jillvekariya.10@gmail.com). 
 | Browser model parity | 200 cases within 0.00001 | Python versus JavaScript synthetic scores |
 
 See [validation conditions](docs/VALIDATION.md), [architecture](docs/ARCHITECTURE.md), [interview guide](docs/INTERVIEW_GUIDE.md) and [career preparation](docs/CAREER_READINESS.md). GitHub Actions passed Python regression tests, Docker image build, Kafka streaming smoke checks and browser model parity on 2026-10-09. [View the successful CI run](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/runs/37929026019).
+
+## Real data and cost-sensitive decisions
+
+[Benchmark protocol and measured results](docs/REAL_BENCHMARK.md) compare five approaches on 284,807 anonymized transactions, using chronological splits and validation-selected thresholds. The browser explorer lets you vary missed-fraud, false-positive and review costs. The benchmark models use PCA features and are separate from the synthetic live model.
 
 ## Start with Docker (recommended)
 

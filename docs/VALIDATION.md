@@ -64,3 +64,7 @@ On 2026-10-09 the project was installed on the authorized Windows computer using
 ## Portfolio browser export
 
 The GitHub package includes the hosted browser source and reproducible Python model export. `python -m scripts.check_browser_parity` checks 200 deterministic synthetic feature cases and compares decisions plus classifier, anomaly and blended scores. The recorded maximum score difference is 0.000000571, below tolerance 0.00001. This checks inference parity; it does not establish production model validity. The hosted deployment remains private as requested.
+
+## Extended portfolio validation
+
+17 Python checks pass, including threshold ties and amount-sensitive cost selection. The full real-data benchmark and protocol are in REAL_BENCHMARK.md. Exact browser classifier explanations matched native XGBoost Tree SHAP on 20 cases within 0.000001 log-odds. The browser interaction check covers guided scenarios, explanation display, threshold changes, cost changes, simulation and feedback; visual rendering remains unverified.

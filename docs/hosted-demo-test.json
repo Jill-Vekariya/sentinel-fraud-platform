@@ -1,0 +1,11 @@
+{
+  "scoring": true,
+  "guided_examples": true,
+  "classifier_explanations": true,
+  "threshold_control": true,
+  "cost_scenarios": true,
+  "benchmark_models": 5,
+  "simulation_count": 30,
+  "feedback": true,
+  "visual_rendering_verified": false
+}

@@ -12,7 +12,7 @@ Suggested project entry (adapt the verbs to your actual contribution):
 - Implemented idempotent scoring and an atomic SQL outbox with Kafka retries, reviewer feedback, drift monitoring and model rollback.
 - Evaluated 2,400 synthetic chronological holdout transactions: PR-AUC 0.7426, recall 0.6203 and false-positive rate 0.6463%; verified the Docker pipeline with 100 streamed events.
 
-Replace “Developed” or “Implemented” with “Adapted and tested” where that better describes your work. Do not list Kubernetes or Azure as deployment experience: their configuration is a reference only. Include the GitHub URL once publication succeeds. The current live demo is private, so do not promise recruiters unrestricted access.
+Replace “Developed” or “Implemented” with “Adapted and tested” where that better describes your work. Do not list Kubernetes or Azure as deployment experience: their configuration is a reference only. Include the GitHub URL once publication succeeds. The personal demo is intended to be public; use the verified URL in the root README. Add real-dataset metrics with the dataset, split and policy scope from REAL_BENCHMARK.md. Hypothetical cost reductions must not be described as measured savings.
 
 ## Build evidence of your own understanding
 
@@ -22,7 +22,7 @@ These are suggested exercises, not completed accomplishments. Record only work y
 2. Replay an identical transaction and then change its amount with the same ID. Explain why the second operation conflicts.
 3. Stop Redis and demonstrate that durable scoring still works. Explain why Redis is a mirror.
 4. Add one useful change, such as a configurable review-capacity policy. Write a failing behavior check, implement it and document the tradeoff.
-5. Compare classifier-only scoring against the 95/5 blend on identical validation/holdout splits. Discuss whether the anomaly component helps.
+5. Reproduce the provided real-data comparison, then compare classifier-only scoring against the 95/5 blend on another defensible split. Explain why their similar PR-AUC does not prove superiority.
 6. Record a short demonstration that explains a failure, recovery and measured result. Do not upload credentials or real transaction data.
 
 ## Four-week preparation plan

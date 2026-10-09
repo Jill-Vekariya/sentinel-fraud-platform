@@ -48,3 +48,6 @@ jobs:
       - run: python -m fraud.train --promote
       - run: python -m scripts.export_browser_model
       - run: python -m scripts.check_browser_parity
+      - run: python -m scripts.check_browser_explanations
+      - run: npm install
+      - run: npm run test:hosted

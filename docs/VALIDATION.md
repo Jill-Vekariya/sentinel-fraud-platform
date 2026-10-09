@@ -55,7 +55,7 @@ npm install
 npm run test:dashboard
 ```
 
-GitHub Actions includes a streaming job that starts Compose, generates 20 Kafka events, checks their durable API decisions and consumes a decision event. That job is provided but was not run here.
+GitHub Actions includes a streaming job that starts Compose, generates 20 Kafka events, checks their durable API decisions and consumes a decision event. That job passed on GitHub Actions on 2026-10-09, along with the Python tests, Docker image build and browser model export/parity check. [CI evidence](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/runs/37929026019) covers source commit f887961.
 
 ## Connected-computer verification
 

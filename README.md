@@ -16,7 +16,7 @@ A runnable portfolio reference: synthetic transaction generation → shared stre
 | Serial HTTP latency | p50 25.12 ms; p95 64.08 ms; p99 136.86 ms | 200 loopback requests, one client |
 | Browser model parity | 200 cases within 0.00001 | Python versus JavaScript synthetic scores |
 
-See [validation conditions](docs/VALIDATION.md), [architecture](docs/ARCHITECTURE.md), [interview guide](docs/INTERVIEW_GUIDE.md) and [career preparation](docs/CAREER_READINESS.md). GitHub Actions is configured; its hosted run status must be checked after publication.
+See [validation conditions](docs/VALIDATION.md), [architecture](docs/ARCHITECTURE.md), [interview guide](docs/INTERVIEW_GUIDE.md) and [career preparation](docs/CAREER_READINESS.md). GitHub Actions passed Python regression tests, Docker image build, Kafka streaming smoke checks and browser model parity on 2026-10-09. [View the successful CI run](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/runs/37929026019).
 
 ## Start with Docker (recommended)
 

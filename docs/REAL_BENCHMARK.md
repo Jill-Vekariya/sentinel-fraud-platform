@@ -8,7 +8,7 @@ Stable chronological Time sort; equal Time values never cross split boundaries. 
 
 Models: prior baseline, logistic regression, XGBoost, Isolation Forest and the fixed 95/5 classifier/anomaly blend. Settings and seed 42 are in the reproducible script. This is a fixed-settings comparison, not a claim that all approaches were optimally tuned.
 
-Each model chooses two operating thresholds on validation only: lowest threshold within a 1% FPR budget, and minimum assumed financial cost. Holdout metrics are reported at these fixed thresholds. Curves in the browser are exploratory; scenario choices use validation curves, then display their holdout outcomes.
+Each model chooses two operating thresholds on validation only: lowest threshold within a 1% FPR budget, and minimum assumed financial cost. Holdout metrics are reported at these fixed thresholds. Curves in the browser are exploratory; scenario choices use validation curves, then display their holdout outcomes. At the default cost assumptions, the browser reuses the exact published minimum-cost threshold. Other scenarios minimize validation cost over the finite grid, with ties favoring fewer flags and then the first grid threshold. This prevents an equally optimal validation quantile from changing the default holdout count.
 
 ## Holdout results at validation-selected minimum-cost thresholds
 

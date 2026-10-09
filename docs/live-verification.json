@@ -1,0 +1,15 @@
+{
+  "readiness": true,
+  "authentication": true,
+  "validation": true,
+  "streamed": 20,
+  "decision_outputs": 20,
+  "durable_replay": true,
+  "payload_conflict": true,
+  "feedback": true,
+  "redis_mirror": true,
+  "late_event_dlq": true,
+  "delivered_outbox": true,
+  "monitoring": true,
+  "prometheus": true
+}

@@ -11,7 +11,7 @@ from .model import ModelManager
 from .monitor import report
 log=logging.getLogger(__name__)
 REQUESTS=Counter('fraud_decisions_total','New durable decisions',['decision'])
-LATENCY=Histogram('fraud_request_seconds','Full scoring request including DB commit',buckets=(.01,.025,.05,.1,.25,.5,1,5))
+LATENCY=Histogram('fraud_request_seconds','Successful scoring handler including DB commit and optional cache',buckets=(.01,.025,.05,.1,.25,.5,1,5))
 
 def auth(x_api_key: str=Header(default='')):
     if not secrets.compare_digest(x_api_key,API_KEY): raise HTTPException(401,'invalid API key')
@@ -46,12 +46,12 @@ def create_app(data_dir=DATA,model_dir=MODELS):
         except (Conflict,LateEvent) as e: raise HTTPException(409,str(e))
         except Exception:
             log.exception('Scoring failed');raise HTTPException(503,'scoring unavailable; retry same transaction_id')
-        LATENCY.observe(time.perf_counter()-start)
         if not result['replayed']: REQUESTS.labels(result['decision']).inc()
         # Cache is an optional read mirror, never the source of correctness.
         if app.state.cache:
             try: app.state.cache.setex('decision:'+tx.transaction_id,3600,json.dumps(result))
             except Exception: log.warning('Redis unavailable; durable SQL result remains valid')
+        LATENCY.observe(time.perf_counter()-start)
         return result
     @app.get('/v1/decisions',dependencies=[Depends(auth)])
     def decisions(): return app.state.store.recent()

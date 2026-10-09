@@ -1,6 +1,8 @@
 # Validation record
 
-Validated on 2026-10-09, Python 3.12.14, Linux x86_64, CPU inference. Training seed 42, 12,000 synthetic events, chronological 60/20/20 split. Reports are synthetic demonstrations, not production fraud results.
+Latest full-system checks and scope are recorded in [FINAL_VERIFICATION.md](FINAL_VERIFICATION.md). The earlier measurements below retain their original conditions.
+
+Initial validation on 2026-10-09, Python 3.12.14, Linux x86_64, CPU inference. Training seed 42, 12,000 synthetic events, chronological 60/20/20 split. Reports are synthetic demonstrations, not production fraud results.
 
 | Check | Result |
 |---|---|
@@ -15,7 +17,7 @@ Validated on 2026-10-09, Python 3.12.14, Linux x86_64, CPU inference. Training s
 | JavaScript syntax | Passed via Node |
 | Python compilation | Passed |
 | Compose / CI / Kubernetes YAML parsing | Passed |
-| Browser visual rendering | Not verified: Chromium download failed |
+| Browser visual rendering | Public desktop browser demo verified on 2026-10-09; Docker dashboard layout remains unverified |
 | Docker image and actual Kafka broker execution | Passed on connected Windows/WSL2 Docker Desktop; 100 streamed transactions scored and decision output consumed |
 | Redis service integration | Passed: a scored decision was present in Redis |
 | Kubernetes, Azure and optional MLflow | Not deployed/exercised |
@@ -59,15 +61,15 @@ GitHub Actions includes a streaming job that starts Compose, generates 20 Kafka 
 
 ## Connected-computer verification
 
-On 2026-10-09 the project was installed on the authorized Windows computer using Docker Desktop. Readiness, durable replay, feedback, Redis decision caching, all 15 regression tests, 100 Kafka inputs, API scoring and Kafka decision output passed. A repeated topic-init bug was fixed with idempotent topic checks. Model bootstrap now retains an existing active model, and producer instructions use `--no-deps` after the stack starts. Desktop launch/demo shortcuts were created. Visual browser rendering remains unverified.
+On 2026-10-09 the project was installed on the authorized Windows computer using Docker Desktop. Readiness, durable replay, feedback, Redis decision caching, all 15 regression tests, 100 Kafka inputs, API scoring and Kafka decision output passed. A repeated topic-init bug was fixed with idempotent topic checks. Model bootstrap now retains an existing active model, and producer instructions use `--no-deps` after the stack starts. Desktop launch/demo shortcuts were created. The public desktop browser demo was subsequently inspected; the Docker dashboard layout remains unverified.
 
 ## Portfolio browser export
 
-The GitHub package includes the hosted browser source and reproducible Python model export. `python -m scripts.check_browser_parity` checks 200 deterministic synthetic feature cases and compares decisions plus classifier, anomaly and blended scores. The recorded maximum score difference is 0.000000571, below tolerance 0.00001. This checks inference parity; it does not establish production model validity. The hosted deployment remains private as requested.
+The GitHub package includes the hosted browser source and reproducible Python model export. `python -m scripts.check_browser_parity` checks 200 deterministic synthetic feature cases and compares decisions plus classifier, anomaly and blended scores. The recorded maximum score difference is 0.000000571, below tolerance 0.00001. This checks inference parity; it does not establish production model validity. The personal GitHub Pages browser demo is public as authorized.
 
 ## Extended portfolio validation
 
-17 Python checks pass, including threshold ties and amount-sensitive cost selection. The full real-data benchmark and protocol are in REAL_BENCHMARK.md. Exact browser classifier explanations matched native XGBoost Tree SHAP on 20 cases within 0.000001 log-odds. The browser interaction check covers guided scenarios, explanation display, threshold changes, cost changes, simulation and feedback; visual rendering remains unverified.
+17 Python checks pass, including threshold ties and amount-sensitive cost selection. The full real-data benchmark and protocol are in REAL_BENCHMARK.md. Exact browser classifier explanations matched native XGBoost Tree SHAP on 20 cases within 0.000001 log-odds. The browser interaction check covers guided scenarios, explanation display, threshold changes, cost changes, simulation and feedback; public desktop browser rendering was subsequently verified.
 
 ## Public personal deployment
 

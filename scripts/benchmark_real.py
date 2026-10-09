@@ -11,7 +11,7 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression
 from sklearn.ensemble import IsolationForest
 from sklearn.metrics import average_precision_score, roc_auc_score
-from xgboost import XGBClassifier
+from xgboost import XGBClassifier, __version__ as xgboost_version
 
 SOURCE='https://www.openml.org/d/1597'
 EXPECTED_MD5='178bcf9bb1f31a3dfe12d0e577884add'
@@ -93,7 +93,7 @@ def run(path, output):
              'splits':{name:{'rows':len(y[s]),'fraud':int(y[s].sum()),'time_min':float(X[s,0].min()),
                             'time_max':float(X[s,0].max()),'fraud_amount':float(amounts[s][y[s]==1].sum())}
                        for name,s in [('train',train),('validation',val),('test',test)]}},
-      'software':{'python':platform.python_version(),**{name:version(name) for name in ['numpy','pandas','scikit-learn','xgboost','scipy']}},
+      'software':{'python':platform.python_version(),**{name:version(name) for name in ['numpy','pandas','scikit-learn','scipy']},'xgboost':xgboost_version},
       'protocol':{'seed':42,'preprocessing':'StandardScaler fitted only on training for logistic regression; no resampling',
         'threshold_selection':'Validation only: lowest threshold at <=1% FPR, and minimum assumed cost',
         'assumed_costs':{'loss_multiplier':1,'false_positive_friction':5,'review_per_flag':1,'currency':'EUR'},

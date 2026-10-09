@@ -12,13 +12,13 @@ Project contact: [jillvekariya.10@gmail.com](mailto:jillvekariya.10@gmail.com). 
 
 | Evidence | Recorded result | Scope |
 |---|---|---|
-| Correctness tests | 15 passed | Python API, features, model lifecycle and failure behavior |
+| Correctness tests | 17 passed | Python API, features, model lifecycle and failure behavior |
 | Actual broker integration | 100 transactions scored; decision output consumed | Local Docker Desktop, Redis and Redpanda |
 | Model holdout | PR-AUC 0.7426; recall 0.6203; FPR 0.6463% | 2,400 synthetic chronological holdout events |
 | Serial HTTP latency | p50 25.12 ms; p95 64.08 ms; p99 136.86 ms | 200 loopback requests, one client |
 | Browser model parity | 200 cases within 0.00001 | Python versus JavaScript synthetic scores |
 
-See [validation conditions](docs/VALIDATION.md), [architecture](docs/ARCHITECTURE.md), [interview guide](docs/INTERVIEW_GUIDE.md) and [career preparation](docs/CAREER_READINESS.md). GitHub Actions passed Python regression tests, Docker image build, Kafka streaming smoke checks and browser model parity on 2026-10-09. [View the successful CI run](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/runs/37929026019).
+See [final integration verification](docs/FINAL_VERIFICATION.md), [three-minute walkthrough](docs/DEMO_WALKTHROUGH.md), [validation conditions](docs/VALIDATION.md), [architecture](docs/ARCHITECTURE.md), [interview guide](docs/INTERVIEW_GUIDE.md) and [career preparation](docs/CAREER_READINESS.md). GitHub Actions passed Python regression tests, Docker image build, Kafka streaming smoke checks and browser model parity on 2026-10-09. [View the successful CI run](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/runs/37929026019).
 
 ## Real data and cost-sensitive decisions
 
@@ -156,4 +156,4 @@ Open http://localhost:5000. MLflow is an experiment log; the local immutable-art
 - `docs/INTERVIEW_GUIDE.md`: architecture explanation and honest resume wording
 - `docs/VALIDATION.md`: measured validation and limitations
 
-Technical references: [FastAPI lifespan tests](https://fastapi.tiangolo.com/advanced/testing-events/), [Confluent Python consumer](https://docs.confluent.io/kafka-clients/python/current/overview.html), [Redis transactions](https://redis.io/docs/latest/develop/using-commands/transactions/). Dependencies are pinned for this project, not asserted to be the latest versions.
+Technical references: [FastAPI lifespan tests](https://fastapi.tiangolo.com/advanced/testing-events/), [Confluent Python consumer](https://docs.confluent.io/kafka-clients/python/current/overview.html), [Redis transactions](https://redis.io/docs/latest/develop/using-commands/transactions/). Dependencies are pinned for this project, not asserted to be the latest versions. Linux x86_64 installs the official CPU-only XGBoost 3.0.0 package to avoid unused GPU dependencies; other platforms retain XGBoost 3.0.0.

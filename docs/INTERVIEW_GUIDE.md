@@ -28,10 +28,11 @@ Use the first-person examples only for work you actually performed and can expla
 
 ## Honest resume version
 
-**Real-Time Fraud Detection & Risk Decisioning Platform** — Python, XGBoost, Isolation Forest, Kafka, FastAPI, Redis, Docker, Kubernetes
+**Real-Time Fraud Detection & Risk Decisioning Platform** — Python, XGBoost, Isolation Forest, Kafka, FastAPI, Redis, Docker
 
 - Built a streaming fraud reference platform with account velocity features, supervised/anomaly risk scoring, review rules and native Tree SHAP explanations.
 - Implemented durable idempotency, an event outbox, manual Kafka offset commits, feedback capture, drift monitoring, chronological evaluation and versioned model rollback.
-- Added an operations dashboard, automated correctness checks, Docker Compose and a Kubernetes deployment reference; evaluated using synthetic transactions.
+- Compared five approaches on 284,807 anonymized credit-card transactions using chronological splits and validation-selected thresholds; XGBoost achieved 0.7639 holdout PR-AUC.
+- Added an operations dashboard, automated checks and a public browser demo with classifier explanations and hypothetical cost scenarios.
 
 Add measured latency or business impact only when you can provide hardware, workload, dataset, baseline and evaluation conditions. Do not reuse “35% fewer false positives,” “2 weeks to 1 day” or “92% recall” from a proposed resume draft as if these were measured results.

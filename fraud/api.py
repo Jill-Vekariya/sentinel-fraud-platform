@@ -2,7 +2,8 @@ import os,json,time,secrets,logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 from fastapi import FastAPI,Depends,HTTPException,Header,Response
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse,JSONResponse
+from fastapi.exceptions import RequestValidationError
 from prometheus_client import Counter, Histogram,generate_latest,CONTENT_TYPE_LATEST
 from .config import DATA,MODELS,API_KEY,REDIS_URL
 from .schema import Transaction,Feedback
@@ -14,7 +15,7 @@ REQUESTS=Counter('fraud_decisions_total','New durable decisions',['decision'])
 LATENCY=Histogram('fraud_request_seconds','Successful scoring handler including DB commit and optional cache',buckets=(.01,.025,.05,.1,.25,.5,1,5))
 
 def auth(x_api_key: str=Header(default='')):
-    if not secrets.compare_digest(x_api_key,API_KEY): raise HTTPException(401,'invalid API key')
+    if not secrets.compare_digest(x_api_key.encode('utf-8'),API_KEY.encode('utf-8')): raise HTTPException(401,'invalid API key')
 
 def create_app(data_dir=DATA,model_dir=MODELS):
     @asynccontextmanager
@@ -28,6 +29,12 @@ def create_app(data_dir=DATA,model_dir=MODELS):
         yield
         if app.state.cache: app.state.cache.close()
     app=FastAPI(title='Fraud Risk Decisioning API',version='1.0.0',lifespan=lifespan)
+    @app.exception_handler(RequestValidationError)
+    async def invalid_request(request,exc):
+        # Invalid JSON numbers can become inf/NaN, which cannot be serialized.
+        # Return field diagnostics without echoing arbitrary inputs or contexts.
+        detail=[{key:error[key] for key in ('loc','msg','type')} for error in exc.errors()]
+        return JSONResponse(status_code=422,content={'detail':detail})
     @app.get('/',include_in_schema=False)
     def home(): return FileResponse(Path(__file__).parent.parent/'web/index.html')
     @app.get('/health/live')

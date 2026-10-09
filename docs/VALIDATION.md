@@ -30,7 +30,7 @@ One sequential client, loopback transport, 200 synthetic transactions, existing 
 - p95: 64.08 ms
 - p99: 136.86 ms
 
-These are measurements on this runtime only; there is no concurrent-load throughput or availability claim. The live stream uses current timestamps and runs faster than the training clock. Hardware/process contention can affect measurements.
+These are historical serial measurements on this runtime only. Later bounded concurrent measurements are recorded separately in [LOAD_SECURITY.md](LOAD_SECURITY.md); neither run establishes an availability or capacity SLA. The live stream uses current timestamps and runs faster than the training clock. Hardware/process contention can affect measurements.
 
 ## Synthetic holdout results
 
@@ -69,7 +69,7 @@ The GitHub package includes the hosted browser source and reproducible Python mo
 
 ## Extended portfolio validation
 
-17 Python checks pass, including threshold ties and amount-sensitive cost selection. The full real-data benchmark and protocol are in REAL_BENCHMARK.md. Exact browser classifier explanations matched native XGBoost Tree SHAP on 20 cases within 0.000001 log-odds. The browser interaction check covers guided scenarios, explanation display, threshold changes, cost changes, simulation and feedback; public desktop browser rendering was subsequently verified.
+17 Python checks passed at this earlier stage, including threshold ties and amount-sensitive cost selection. The full real-data benchmark and protocol are in REAL_BENCHMARK.md. Exact browser classifier explanations matched native XGBoost Tree SHAP on 20 cases within 0.000001 log-odds. The browser interaction check covers guided scenarios, explanation display, threshold changes, cost changes, simulation and feedback; public desktop browser rendering was subsequently verified. The final suite contains 18 tests, as recorded in [FINAL_VERIFICATION.md](FINAL_VERIFICATION.md).
 
 ## Public personal deployment
 

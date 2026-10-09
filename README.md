@@ -2,7 +2,7 @@
 
 A runnable portfolio reference: synthetic transaction generation → shared streaming features → XGBoost + Isolation Forest risk score → APPROVE / REVIEW / BLOCK → durable audit ledger → feedback and monitoring → candidate retraining and guarded model promotion.
 
-**Status:** implemented and tested locally. Synthetic data only by default. No claim of production readiness, a 35% false-positive reduction, real fraud capture, or guaranteed sub-100 ms latency. Docker and cloud deployment configurations are included; check `docs/VALIDATION.md` for what was actually exercised.
+**Status:** portfolio feature set frozen after Docker integration, regression, benchmark reproduction, bounded load and basic security checks. Synthetic data only by default. No claim of production readiness, a 35% false-positive reduction, real fraud capture, or guaranteed sub-100 ms latency. See [release scope and limitations](docs/RELEASE_FREEZE.md).
 
 ## Online demo and evidence
 
@@ -12,13 +12,16 @@ Project contact: [jillvekariya.10@gmail.com](mailto:jillvekariya.10@gmail.com). 
 
 | Evidence | Recorded result | Scope |
 |---|---|---|
-| Correctness tests | 17 passed | Python API, features, model lifecycle and failure behavior |
+| Correctness tests | 18 passed | Python API, features, model lifecycle and failure behavior |
 | Actual broker integration | 100 transactions scored; decision output consumed | Local Docker Desktop, Redis and Redpanda |
 | Model holdout | PR-AUC 0.7426; recall 0.6203; FPR 0.6463% | 2,400 synthetic chronological holdout events |
 | Serial HTTP latency | p50 25.12 ms; p95 64.08 ms; p99 136.86 ms | 200 loopback requests, one client |
 | Browser model parity | 200 cases within 0.00001 | Python versus JavaScript synthetic scores |
+| Bounded concurrent load | 300/300 HTTP successes; p95 987 ms at 10 clients | Isolated single API; 100 requests at each of 1, 5 and 10 clients |
+| Basic security checks | 27 passed; two error-handling bugs fixed | Authentication, invalid input, replay conflict and rejected-request persistence |
+| Real benchmark reproduction | 17,147 numeric comparisons passed | 284,807 rows, five approaches; absolute tolerance 1e-8 |
 
-See [final integration verification](docs/FINAL_VERIFICATION.md), [three-minute walkthrough](docs/DEMO_WALKTHROUGH.md), [validation conditions](docs/VALIDATION.md), [architecture](docs/ARCHITECTURE.md), [interview guide](docs/INTERVIEW_GUIDE.md) and [career preparation](docs/CAREER_READINESS.md). GitHub Actions passed Python regression tests, Docker image build, Kafka streaming smoke checks and browser model parity on 2026-10-09. [View the successful CI run](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/runs/37929026019).
+Watch the [48-second captioned API demonstration](docs/sentinel-demo.mp4), with [transcript and captured-response provenance](docs/DEMO_TRANSCRIPT.md). See [final integration verification](docs/FINAL_VERIFICATION.md), [load and security measurements](docs/LOAD_SECURITY.md), [three-minute walkthrough](docs/DEMO_WALKTHROUGH.md), [validation conditions](docs/VALIDATION.md), [architecture](docs/ARCHITECTURE.md), [interview guide](docs/INTERVIEW_GUIDE.md) and [career preparation](docs/CAREER_READINESS.md). The [GitHub Actions workflow](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/workflows/ci.yml) checks Python regressions, Docker image build, Kafka streaming and browser model parity on clean hosted runners.
 
 ## Real data and cost-sensitive decisions
 
@@ -147,7 +150,7 @@ Open http://localhost:5000. MLflow is an experiment log; the local immutable-art
 
 - `fraud/`: training, feature code, model lifecycle, scoring API, SQL state, streaming, monitoring and retraining
 - `web/index.html`: operations dashboard with scoring, explanations and reviewer feedback
-- `scripts/`: labelled CSV generator, serial HTTP benchmark/demo, browser model export and parity verification
+- `scripts/`: labelled CSV generator, serial HTTP demo, bounded load/security checks, benchmark reproduction and browser parity verification
 - `hosted-demo/`: static browser inference demo, separate from the Docker backend
 - `tests/`: correctness and API regression checks
 - `deploy/`: Kubernetes reference manifest and Azure deployment guide

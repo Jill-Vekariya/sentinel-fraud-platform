@@ -16,3 +16,4 @@ Verify-Installation.ps1
 *.zip
 node_modules/
 .openai/
+docs/load-security-baseline.json

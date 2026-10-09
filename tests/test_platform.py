@@ -79,6 +79,17 @@ def test_model_artifacts_and_monitor(store,models):
     assert isinstance(result['explanations'],list)
     assert report(store,manager)['psi']=={}
 
+def test_invalid_header_and_overflow_are_client_errors(tmp_path,models):
+    with TestClient(create_app(tmp_path,models)) as client:
+        body=tx().model_dump(mode='json')
+        assert client.post('/v1/score',json=body,headers={b'X-API-Key':b'\xe9'}).status_code==401
+        raw=json.dumps(body).replace('"amount": 100.0','"amount": 1e999')
+        assert '1e999' in raw
+        response=client.post('/v1/score',content=raw,
+            headers={'X-API-Key':API_KEY,'Content-Type':'application/json'})
+        assert response.status_code==422 and response.json()['detail'][0]['loc']==['body','amount']
+        assert client.get('/v1/decisions',headers={'X-API-Key':API_KEY}).json()==[]
+
 def test_pointer_rollback_and_reload(tmp_path,models):
     import shutil
     target=tmp_path/'models';shutil.copytree(models,target)

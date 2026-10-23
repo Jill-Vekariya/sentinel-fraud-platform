@@ -17,3 +17,10 @@ Verify-Installation.ps1
 *.zip
 node_modules/
 .openai/
+
+# Local credentials and workstation caches
+.env.*
+!.env.example
+!.env.sample
+.DS_Store
+Thumbs.db

@@ -2,8 +2,9 @@
   "name": "sentinel-fraud-dashboard-tests",
   "private": true,
   "scripts": {
-    "test:dashboard": "node tests/dashboard.integration.cjs",
-    "test:hosted": "node tests/hosted-demo.integration.cjs"
+    "test:dashboard": "python scripts/test_dashboard.py",
+    "test:hosted": "node tests/hosted-demo.integration.cjs",
+    "test:dashboard:attached": "node tests/dashboard.integration.cjs"
   },
   "devDependencies": {
     "jsdom": "30.1.2"

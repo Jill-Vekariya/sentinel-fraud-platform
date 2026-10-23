@@ -2,8 +2,10 @@ FROM python:3.12-slim
 RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 ENV PYTHONUNBUFFERED=1 OMP_NUM_THREADS=2
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt requirements-linux-py312.lock ./
+RUN if [ "$(uname -m)" = "x86_64" ]; then \
+      pip install --no-cache-dir --require-hashes -r requirements-linux-py312.lock; \
+    else pip install --no-cache-dir -r requirements.txt; fi
 COPY . .
 RUN useradd --uid 10001 --create-home fraud && mkdir -p /app/data /app/models && chown -R fraud:fraud /app
 USER fraud

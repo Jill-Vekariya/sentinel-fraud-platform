@@ -1,8 +1,12 @@
 # Sentinel — Real-Time Fraud Detection & Risk Decisioning
 
+[Current status and remaining work](docs/CURRENT_STATUS.md) · [Interview practice](docs/INTERVIEW_PRACTICE.md)
+
 A runnable portfolio reference: synthetic transaction generation → shared streaming features → XGBoost + Isolation Forest risk score → APPROVE / REVIEW / BLOCK → durable audit ledger → feedback and monitoring → candidate retraining and guarded model promotion.
 
 **Status:** portfolio feature set frozen after Docker integration, regression, benchmark reproduction, bounded load and basic security checks. Synthetic data only by default. No claim of production readiness, a 35% false-positive reduction, real fraud capture, or guaranteed sub-100 ms latency. See [release scope and limitations](docs/RELEASE_FREEZE.md).
+
+Implementation, testing, and documentation used AI assistance; the [ownership log](docs/OWNERSHIP.md) distinguishes that work from personal contributions.
 
 ## 🎥 Demo Video
 
@@ -70,7 +74,9 @@ Use Python 3.12. Windows users can activate `.venv\Scripts\activate`; macOS/Linu
 ```bash
 python -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
+# Linux x86_64 / Python 3.12:
+pip install --require-hashes -r requirements-linux-py312.lock
+# Other platforms: pip install -r requirements.txt
 python -m fraud.train --promote
 uvicorn fraud.api:app --host 127.0.0.1 --port 8000
 ```
@@ -83,6 +89,22 @@ python -m pytest -q
 ```
 
 The demo sends serial HTTP transactions and synthetic ground-truth feedback. It prints measured HTTP p50/p95/p99; it does not establish concurrent throughput. `models/` and `data/` are created locally. The downloadable package includes a pre-trained synthetic model. Git clones exclude generated Python model artifacts; run the training command first.
+
+## Development checks
+
+Install the runtime dependencies first, then:
+
+```bash
+pip install -r requirements-dev.txt
+python -m ruff check fraud scripts tests
+python -m ruff format --check fraud scripts tests
+python -m pytest -q
+npm ci
+npm run test:hosted
+npm run test:dashboard
+```
+
+The dashboard command creates an isolated temporary backend; it does not use existing model/data state. New DOM evidence is written to `reports/local/`. See [current status](docs/CURRENT_STATUS.md) for attached-server options and output paths.
 
 ## Example request
 

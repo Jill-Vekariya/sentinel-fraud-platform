@@ -17,3 +17,14 @@ Verify-Installation.ps1
 node_modules/
 .openai/
 docs/load-security-baseline.json
+
+# Local credentials and workstation caches
+.env.*
+!.env.example
+!.env.sample
+.DS_Store
+Thumbs.db
+
+# New verification outputs; historical evidence stays tracked.
+reports/local/
+.ruff_cache/

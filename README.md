@@ -192,3 +192,7 @@ Open http://localhost:5000. MLflow is an experiment log; the local immutable-art
 - `docs/VALIDATION.md`: measured validation and limitations
 
 Technical references: [FastAPI lifespan tests](https://fastapi.tiangolo.com/advanced/testing-events/), [Confluent Python consumer](https://docs.confluent.io/kafka-clients/python/current/overview.html), [Redis transactions](https://redis.io/docs/latest/develop/using-commands/transactions/). Dependencies are pinned for this project, not asserted to be the latest versions. Linux x86_64 installs the official CPU-only XGBoost 3.0.0 package to avoid unused GPU dependencies; other platforms retain XGBoost 3.0.0.
+
+## License
+
+Repository code uses the [MIT license](LICENSE). External data retains the source terms described in the benchmark documentation.

@@ -15,3 +15,5 @@ New DOM reports go under ignored `reports/local/` paths and refuse to overwrite 
 The 95/5 risk score is not a calibrated fraud probability. Measured synthetic results, historical real-data metrics and assumed business costs have different scopes. The local demo key is publicly documented. Distributed state, automatic online canary routing, scheduled retraining, managed Azure endpoints and production readiness are not claimed. Existing Kubernetes/Azure files remain reference material.
 
 Personal coding/review/reproduction must be recorded truthfully in [ownership](OWNERSHIP.md); study [the interview guide](INTERVIEW_GUIDE.md) and [career readiness](CAREER_READINESS.md).
+
+[Cleanup changes and local verification](CLEANUP_VERIFICATION.md).

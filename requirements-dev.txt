@@ -1,0 +1,2 @@
+# Install runtime requirements first.
+ruff==0.17.0

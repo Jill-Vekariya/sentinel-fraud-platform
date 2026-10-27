@@ -32,6 +32,7 @@ services:
     ports: ["127.0.0.1:8000:8000"]
     environment:
       API_KEY: ${API_KEY:-local-demo-change-me}
+      FRAUD_ENV: ${FRAUD_ENV:-local}
       REDIS_URL: redis://redis:6379/0
     volumes: ["models:/app/models", "data:/app/data"]
     depends_on:

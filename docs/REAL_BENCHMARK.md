@@ -31,7 +31,7 @@ Download the compressed public CSV and extract it into `data/benchmarks/` (never
 ```bash
 curl -L --fail https://maxhalford.github.io/files/datasets/creditcardfraud.zip -o data/benchmarks/creditcard.zip
 # Extract creditcard.csv with your ZIP utility.
-python -m scripts.benchmark_real --dataset data/benchmarks/creditcard.csv --output docs/real-benchmark.json
+python -m scripts.benchmark_real --dataset data/benchmarks/creditcard.csv --output reports/local/my-real-benchmark.json
 ```
 
 Create the destination directory first. Install requirements using Python 3.12. The recorded run used Docker/Python 3.12.15, NumPy 2.2.5, pandas 2.2.3, scikit-learn 1.6.1, XGBoost 3.0.0 and SciPy 1.18.1. Copy the report to `hosted-demo/benchmark.json` for the browser. JSON includes split counts, raw file checksum, both policy outcomes and validation/holdout threshold curves. A verified OpenML ARFF can also be supplied; its expected MD5 is checked.

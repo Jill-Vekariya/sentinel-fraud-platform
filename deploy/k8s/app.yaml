@@ -29,6 +29,7 @@ spec:
           image: YOUR_REGISTRY/fraud-platform:1.0.0
           ports: [{containerPort: 8000}]
           env:
+            - {name: FRAUD_ENV, value: production}
             - name: API_KEY
               valueFrom: {secretKeyRef: {name: fraud-api-key, key: api-key}}
           volumeMounts:

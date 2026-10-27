@@ -1,5 +1,7 @@
 name: Validate fraud platform
 on: [push, pull_request]
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -7,7 +9,10 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12', cache: pip}
-      - run: pip install -r requirements.txt
+      - run: pip install --require-hashes -r requirements-linux-py312.lock
+      - run: pip install -r requirements-dev.txt
+      - run: python -m ruff check fraud scripts tests
+      - run: python -m ruff format --check fraud scripts tests
       - run: python -m pytest -q
       - run: python -m compileall -q fraud scripts
   image:
@@ -26,7 +31,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
-      - run: pip install httpx pydantic
+      - run: pip install httpx==0.28.1 pydantic==2.11.4
       - run: docker compose up --build -d
       - run: docker compose run --rm --no-deps producer python -m fraud.produce --seed 99 --count 20 --delay 0.05
       - run: python -m scripts.check_stream
@@ -44,10 +49,26 @@ jobs:
         with: {python-version: '3.12', cache: pip}
       - uses: actions/setup-node@v4
         with: {node-version: '22'}
-      - run: pip install -r requirements.txt
+      - run: pip install --require-hashes -r requirements-linux-py312.lock
       - run: python -m fraud.train --promote
       - run: python -m scripts.export_browser_model
       - run: python -m scripts.check_browser_parity
       - run: python -m scripts.check_browser_explanations
-      - run: npm install
+      - run: npm ci --no-audit --no-fund
       - run: npm run test:hosted
+      - run: npm run test:dashboard
+  demo-image:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: docker build --platform linux/amd64 -f Dockerfile.demo -t sentinel-demo:ci .
+      - run: python scripts/check_demo_container.py --image sentinel-demo:ci --output reports/local/demo-container.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-container-verification
+          path: reports/local/demo-container*

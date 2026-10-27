@@ -1,5 +1,7 @@
 name: Validate fraud platform
 on: [push, pull_request]
+permissions:
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -55,3 +57,18 @@ jobs:
       - run: npm ci --no-audit --no-fund
       - run: npm run test:hosted
       - run: npm run test:dashboard
+  demo-image:
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: docker build --platform linux/amd64 -f Dockerfile.demo -t sentinel-demo:ci .
+      - run: python scripts/check_demo_container.py --image sentinel-demo:ci --output reports/local/demo-container.json
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-container-verification
+          path: reports/local/demo-container*

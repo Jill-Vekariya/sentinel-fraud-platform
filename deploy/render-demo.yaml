@@ -1,0 +1,24 @@
+# DRAFT ONLY: requires explicit publication authorization and account verification.
+# No database, disk, worker, Redis, autoscaling or paid plan is requested.
+services:
+  - type: web
+    name: sentinel-synthetic-demo
+    runtime: docker
+    plan: free
+    region: singapore
+    numInstances: 1
+    dockerfilePath: ./Dockerfile.demo
+    dockerContext: .
+    healthCheckPath: /health/ready
+    autoDeployTrigger: "off"
+    envVars:
+      - key: API_KEY
+        generateValue: true
+      - key: FRAUD_ENV
+        value: production
+      - key: PORT
+        value: "10000"
+      - key: DATA_DIR
+        value: /tmp/sentinel-data
+      - key: REDIS_URL
+        value: ""

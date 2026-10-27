@@ -1,16 +1,19 @@
+import os
 import json
 import time
 import secrets
 import logging
+import uuid
 from contextlib import asynccontextmanager
 from pathlib import Path
-from fastapi import FastAPI, Depends, HTTPException, Header, Response
+from fastapi import FastAPI, Depends, HTTPException, Header, Response, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.exceptions import RequestValidationError
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 from .config import DATA, MODELS, API_KEY, REDIS_URL
 from .schema import Transaction, Feedback
 from .store import Store, Conflict, LateEvent
+from .middleware import BodyLimitMiddleware
 from .model import ModelManager
 from .monitor import report
 
@@ -22,6 +25,17 @@ LATENCY = Histogram(
     buckets=(0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 5),
 )
 
+HTTP_REQUESTS = Counter(
+    "fraud_http_requests_total",
+    "HTTP requests including rejected and failed requests",
+    ["method", "route", "status"],
+)
+HTTP_LATENCY = Histogram(
+    "fraud_http_request_seconds",
+    "Application request duration including validation and auth",
+    ["method", "route"],
+)
+
 
 def auth(x_api_key: str = Header(default="")):
     if not secrets.compare_digest(x_api_key.encode("utf-8"), API_KEY.encode("utf-8")):
@@ -29,6 +43,11 @@ def auth(x_api_key: str = Header(default="")):
 
 
 def create_app(data_dir=DATA, model_dir=MODELS):
+    if os.getenv("FRAUD_ENV", "local") == "production" and (
+        len(API_KEY) < 24 or API_KEY == "local-demo-change-me"
+    ):
+        raise ValueError("Production requires a non-demo API key of at least 24 characters")
+
     @asynccontextmanager
     async def lifespan(app):
         app.state.store = Store(Path(data_dir) / "fraud.db")
@@ -46,6 +65,37 @@ def create_app(data_dir=DATA, model_dir=MODELS):
             app.state.cache.close()
 
     app = FastAPI(title="Fraud Risk Decisioning API", version="1.0.0", lifespan=lifespan)
+    app.add_middleware(BodyLimitMiddleware, max_bytes=65_536)
+
+    @app.middleware("http")
+    async def request_telemetry(request: Request, call_next):
+        request_id, start, status = uuid.uuid4().hex, time.perf_counter(), 500
+        try:
+            response = await call_next(request)
+            status = response.status_code
+            response.headers["X-Request-ID"] = request_id
+            return response
+        finally:
+            # Use route templates, never submitted IDs, payloads, credentials or raw URLs.
+            route = getattr(request.scope.get("route"), "path", "<unmatched>")
+            method = (
+                request.method if request.method in {"GET", "POST", "HEAD", "OPTIONS"} else "OTHER"
+            )
+            elapsed = time.perf_counter() - start
+            HTTP_REQUESTS.labels(method, route, str(status)).inc()
+            HTTP_LATENCY.labels(method, route).observe(elapsed)
+            log.info(
+                json.dumps(
+                    {
+                        "event": "http_request",
+                        "request_id": request_id,
+                        "method": method,
+                        "route": route,
+                        "status": status,
+                        "duration_ms": round(elapsed * 1000, 3),
+                    }
+                )
+            )
 
     @app.exception_handler(RequestValidationError)
     async def invalid_request(request, exc):

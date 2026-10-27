@@ -195,3 +195,36 @@ def test_corrupt_artifact_rejected(tmp_path, models):
     (target / version / "classifier.json").write_text("{}")
     with pytest.raises(ValueError, match="checksum"):
         ModelManager(target).load()
+
+
+def test_api_body_limit_rejects_before_json_and_store(tmp_path, models):
+    with TestClient(create_app(tmp_path, models)) as client:
+        response = client.post(
+            "/v1/score", content=b"x" * 65_537, headers={"Content-Type": "application/json"}
+        )
+        assert response.status_code == 413
+        assert not client.app.state.store.rows()
+        assert client.get("/health/ready").status_code == 200
+
+
+def test_http_metrics_include_rejections_without_exposing_ids_or_keys(tmp_path, models, caplog):
+    import logging
+
+    caplog.set_level(logging.INFO, logger="fraud.api")
+    with TestClient(create_app(tmp_path, models)) as client:
+        denied = client.get("/v1/decisions/private-customer-id")
+        assert denied.status_code == 401
+        assert len(denied.headers["x-request-id"]) == 32
+        invalid = client.post("/v1/score", headers={"X-API-Key": API_KEY}, json={})
+        assert invalid.status_code == 422
+        large = client.post("/v1/score", content=b"x" * 65_537)
+        assert large.status_code == 413
+        metrics = client.get("/metrics", headers={"X-API-Key": API_KEY}).text
+        assert 'route="/v1/decisions/{tid}",status="401"' in metrics
+        assert 'route="/v1/score",status="422"' in metrics
+        assert 'route="<unmatched>",status="413"' in metrics
+        assert "fraud_http_request_seconds_count" in metrics
+    assert "private-customer-id" not in caplog.text
+    telemetry = [json.loads(r.message) for r in caplog.records if r.name == "fraud.api"]
+    assert {401, 413, 422}.issubset({r["status"] for r in telemetry})
+    assert all("payload" not in r and "api_key" not in r for r in telemetry)

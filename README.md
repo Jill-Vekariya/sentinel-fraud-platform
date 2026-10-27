@@ -1,198 +1,82 @@
-# Sentinel — Real-Time Fraud Detection & Risk Decisioning
+# Sentinel
 
-[Current status and remaining work](docs/CURRENT_STATUS.md) · [Interview practice](docs/INTERVIEW_PRACTICE.md)
+**Fraud scoring with transactional decisions, replay safety and an explicit at-least-once streaming contract.**
 
-A runnable portfolio reference: synthetic transaction generation → shared streaming features → XGBoost + Isolation Forest risk score → APPROVE / REVIEW / BLOCK → durable audit ledger → feedback and monitoring → candidate retraining and guarded model promotion.
+Sentinel combines XGBoost output, an Isolation Forest anomaly percentile and review rules. One SQLite transaction checks event identity, computes features from bounded account history and commits the decision, history and output outbox together. Optional Kafka-compatible input and Redis reads extend the local API without making them correctness authorities.
 
-**Status:** portfolio feature set frozen after Docker integration, regression, benchmark reproduction, bounded load and basic security checks. Synthetic data only by default. No claim of production readiness, a 35% false-positive reduction, real fraud capture, or guaranteed sub-100 ms latency. See [release scope and limitations](docs/RELEASE_FREEZE.md).
+[Browser demo](https://jill-vekariya.github.io/sentinel-fraud-platform/) · [Dashboard video](docs/sentinel-dashboard-demo.mp4) · [Interview guide](docs/INTERVIEW.md) · [Real-data benchmark](docs/REAL_BENCHMARK.md)
 
-Implementation, testing, and documentation used AI assistance; the [ownership log](docs/OWNERSHIP.md) distinguishes that work from personal contributions.
+The browser edition runs exported synthetic inference and classifier explanations, plus a separate real-data cost explorer. It does not host the Python/Kafka backend. [Demo/transcript](docs/DASHBOARD_DEMO.md) · [Browser model parity](docs/browser-model-parity.json).
 
-## 🎥 Demo Video
+## Architecture
 
-[▶ Watch the Sentinel dashboard demonstration](docs/sentinel-dashboard-demo.mp4)
-
-A captioned walkthrough using captures of the actual public application: scoring, classifier explanations and the real-data cost explorer. [Transcript and capture details](docs/DASHBOARD_DEMO.md). Also available: the [48-second recorded Docker API walkthrough](docs/sentinel-demo.mp4), with [captured-response provenance](docs/DEMO_TRANSCRIPT.md). Videos are hosted in this repository.
-
-## 🌐 Live Demo
-
-The public personal demo runs exported synthetic model inference, exact classifier Tree SHAP, guided scenarios and a real-dataset cost explorer. [Open the public demo](https://jill-vekariya.github.io/sentinel-fraud-platform/). The full Python/Kafka platform runs separately through Docker.
-
-## 💻 Source Code
-
-[View the GitHub repository](https://github.com/Jill-Vekariya/sentinel-fraud-platform). Project contact: [jillvekariya.10@gmail.com](mailto:jillvekariya.10@gmail.com).
-
-## Verification evidence
-
-| Evidence | Recorded result | Scope |
-|---|---|---|
-| Correctness tests | 18 passed | Python API, features, model lifecycle and failure behavior |
-| Actual broker integration | 100 transactions scored; decision output consumed | Local Docker Desktop, Redis and Redpanda |
-| Model holdout | PR-AUC 0.7426; recall 0.6203; FPR 0.6463% | 2,400 synthetic chronological holdout events |
-| Serial HTTP latency | p50 25.12 ms; p95 64.08 ms; p99 136.86 ms | 200 loopback requests, one client |
-| Browser model parity | 200 cases within 0.00001 | Python versus JavaScript synthetic scores |
-| Bounded concurrent load | 300/300 successes in each of two runs; 10-client p95 987 / 1,269 ms | Isolated single API; 100 requests at each of 1, 5 and 10 clients per run |
-| Basic security checks | 27 passed; two error-handling bugs fixed | Authentication, invalid input, replay conflict and rejected-request persistence |
-| Real benchmark reproduction | 17,147 numeric comparisons passed | 284,807 rows, five approaches; absolute tolerance 1e-8 |
-
-The [final checklist](docs/FINAL_CHECKLIST.md) records a fresh Git clone with new model/data volumes: all 18 tests, producer-to-broker processing, durable decisions/output, restart replay, complete benchmark reproduction and a second load/security run passed. See [integration verification](docs/FINAL_VERIFICATION.md), [load and security measurements](docs/LOAD_SECURITY.md), [three-minute walkthrough](docs/DEMO_WALKTHROUGH.md), [validation conditions](docs/VALIDATION.md), [architecture diagram](docs/ARCHITECTURE.md), [ten interview answers](docs/INTERVIEW_GUIDE.md) and [career preparation](docs/CAREER_READINESS.md). The [GitHub Actions workflow](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/workflows/ci.yml) checks Python regressions, Docker image build, Kafka streaming and browser model parity on clean hosted runners.
-
-## Real data and cost-sensitive decisions
-
-[Benchmark protocol and measured results](docs/REAL_BENCHMARK.md) compare five approaches on 284,807 anonymized transactions, using chronological splits and validation-selected thresholds. The browser explorer lets you vary missed-fraud, false-positive and review costs. The benchmark models use PCA features and are separate from the synthetic live model.
-
-## Start with Docker (recommended)
-
-Install Docker Desktop with Compose v2 and allocate about 4 GB memory.
-
-```bash
-cp .env.example .env
-docker compose up --build -d
-docker compose logs -f trainer api worker
+```mermaid
+flowchart TD
+  H["Validated HTTP transaction"] --> A["Authenticated scoring API"]
+  K["Account-keyed Kafka-compatible input"] --> W["Worker and manual offset commit"]
+  W --> A
+  M["Trusted versioned model artifacts"] --> A
+  A --> S["SQLite: history, decision and outbox transaction"]
+  A --> R["Optional Redis read mirror"]
+  S --> P["Confirmed outbox publication"]
+  P --> O["Decision stream, at least once"]
+  S --> F["Feedback and monitoring"]
 ```
 
-The one-shot trainer builds a model before the API starts. Open **http://localhost:8000** for the dashboard and **http://localhost:8000/docs** for the API explorer. Enter the API key from `.env`; the local demo default is `local-demo-change-me`.
+Identical retries replay the original decision/model version; changed payloads under the same ID return 409. Events older than the account watermark are rejected. Publication and SQL delivery marking are separate, so output can duplicate after a crash; downstream consumers must deduplicate. [Architecture and trade-offs](docs/ARCHITECTURE.md).
 
-Produce a Kafka stream:
+## Quick start: API without a broker
 
-```bash
-docker compose run --rm --no-deps producer
-```
-
-Redpanda is a Kafka-compatible broker. The producer keys events by account ID; the consumer scores them through the API and publishes durable outbox results to `decisions`. The dashboard refreshes on demand. To inspect output:
+Requires Git, Python 3.12 and dependency-download access. Linux x86-64 commands, from a new clone:
 
 ```bash
-docker compose exec broker rpk topic consume decisions -n 5
+git clone https://github.com/Jill-Vekariya/sentinel-fraud-platform.git
+cd sentinel-fraud-platform
+python3.12 -m venv .venv
+.venv/bin/python -m pip install --require-hashes -r requirements-linux-py312.lock
+.venv/bin/python -m fraud.train --promote
+.venv/bin/python -m uvicorn fraud.api:app --host 127.0.0.1 --port 8000
 ```
 
-Stop with `docker compose down`. Add `-v` only when intentionally deleting all demo state. The producer uses the current epoch as its default seed, giving new IDs on later runs. An explicit reused seed produces reused IDs with changed timestamps and therefore conflicts; use a fresh seed for each new stream. The live producer stamps current UTC time so subsequent new streams respect account watermarks. Live simulation runs faster than the training event clock; interpret its drift and metrics as demo observations.
+Open `http://127.0.0.1:8000`; the API explorer is `/docs`. The local demo key is `local-demo-change-me`. Training creates a synthetic model first; a Git clone does not include generated model files. Other platforms use the separately resolved `requirements.txt` path in [the runbook](docs/RUNBOOK.md), rather than claiming the Linux wheel lock verifies Windows.
 
-## Start with Python (no broker required)
+In a second terminal, run `.venv/bin/python -m scripts.demo --count 200` for a local serial scoring/feedback example. It uses synthetic events and prints that run's HTTP timings. Existing checkouts should use owned `DATA_DIR`/`MODEL_DIR` paths and retain previous models/data.
 
-Use Python 3.12. Windows users can activate `.venv\Scripts\activate`; macOS/Linux use the command below.
+For the full streaming topology, start Docker Linux/Compose v2 and follow [the walkthrough](docs/DEMO_WALKTHROUGH.md): create `.env` only if absent, run `docker compose up --build -d`, then `docker compose run --rm --no-deps producer`. Stop with `docker compose down`, preserving volumes. The trainer precedes API startup; producer messages are keyed by account. Reusing explicit producer seeds can conflict with old IDs.
+
+## Results and verification
+
+| Evidence | Recorded observation | Limit |
+| --- | --- | --- |
+| [Historical broker verification](docs/FINAL_VERIFICATION.md) | 100 transactions scored and decision output consumed | Local Docker/Redpanda integration at the recorded source |
+| [Bounded load](docs/LOAD_SECURITY.md) | Two runs completed 300/300 requests each; ten-client p95 987 ms and 1,269 ms | Single local API, bounded workload; no guaranteed sub-100 ms latency |
+| [Real-data benchmark](docs/REAL_BENCHMARK.md) | Five approaches on 284,807 anonymized rows, chronological splits and validation-selected thresholds | Offline PCA-feature models differ from the synthetic serving model; cost scenarios are assumptions |
+| [Stage 4 local review](docs/INTERVIEW.md) | 21 selected transactional/API/boundary/mocked-stream tests passed | No new broker, external financial event or production outcome |
+
+For development, after runtime installation:
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
-# Linux x86_64 / Python 3.12:
-pip install --require-hashes -r requirements-linux-py312.lock
-# Other platforms: pip install -r requirements.txt
-python -m fraud.train --promote
-uvicorn fraud.api:app --host 127.0.0.1 --port 8000
+.venv/bin/python -m pip install -r requirements-dev.txt
+.venv/bin/python -m pytest -q
+.venv/bin/python -m ruff check fraud scripts tests
+.venv/bin/python -m ruff format --check fraud scripts tests
+python scripts/check_links.py
 ```
 
-In a second terminal, activate the same environment and run:
+[Validation conditions](docs/VALIDATION.md) distinguish synthetic holdout, real-data offline evaluation, browser parity and HTTP measurements. [Current status](docs/CURRENT_STATUS.md) documents optional DOM checks. A configured workflow is not evidence of a successful run at a later revision.
 
-```bash
-python -m scripts.demo --count 200
-python -m pytest -q
-```
+## Operating limits
 
-The demo sends serial HTTP transactions and synthetic ground-truth feedback. It prints measured HTTP p50/p95/p99; it does not establish concurrent throughput. `models/` and `data/` are created locally. The downloadable package includes a pre-trained synthetic model. Git clones exclude generated Python model artifacts; run the training command first.
+- Scoring holds a serialized SQLite writer transaction. Redis is a disposable mirror, not a second authoritative ledger. Account histories retain at most 24 hours/1,000 events; high-rate accounts can lose part of their window through truncation.
+- The 95/5 classifier/anomaly blend is a ranking signal, not a calibrated fraud-loss probability. Tree SHAP explains the classifier margin, not the anomaly component, rules or causal effects.
+- Feedback can be selectively labeled; PSI is an investigation heuristic. Retraining creates candidates, with explicit promotion and demo validation gates. There is no automatic scheduling/promotion.
+- Production mode requires `FRAUD_ENV=production` and a private non-demo `API_KEY` of at least 24 characters. Actual bodies are capped at 65,536 bytes before parsing. These guards do not establish a complete public security/retention policy.
+- Load only trusted local model artifacts: checksums do not make attacker-controlled pickle files safe. Concurrent model promoters and shared outbox publishers need additional coordination.
 
-## Development checks
+The [prepared single-service deployment](docs/DEPLOYMENT_DEMO.md) excludes the broker/publisher, runs one API worker and uses temporary SQLite. Its earlier native check is not proof of a newly built/capped image or public backend. Check the exact build/deployment receipt before making those claims.
 
-Install the runtime dependencies first, then:
+## Ownership, next work and license
 
-```bash
-pip install -r requirements-dev.txt
-python -m ruff check fraud scripts tests
-python -m ruff format --check fraud scripts tests
-python -m pytest -q
-npm ci
-npm run test:hosted
-npm run test:dashboard
-```
+Implementation, tests, evaluation and documentation used AI assistance. [OWNERSHIP.md](docs/OWNERSHIP.md) records personal work only when confirmed. No production customers, fraud savings or independent authorship are inferred from these demonstrations.
 
-The dashboard command creates an isolated temporary backend; it does not use existing model/data state. New DOM evidence is written to `reports/local/`. See [current status](docs/CURRENT_STATUS.md) for attached-server options and output paths.
-
-## Example request
-
-```bash
-curl http://localhost:8000/v1/score \
-  -H 'X-API-Key: local-demo-change-me' \
-  -H 'Content-Type: application/json' \
-  -d '{"transaction_id":"example_1","account_id":"demo_1","timestamp":"2026-10-09T10:00:00Z","amount":850,"device_id":"device_1","country":"GB","home_country":"US"}'
-```
-
-Inputs use timezone-aware timestamps and a single currency assumption (USD). Do not mix currencies without upstream normalization. The response contains the blended risk score, supervised probability, anomaly percentile, decision, reason codes, model version, threshold and supervised Tree SHAP contributions. `risk_score` is a ranking score, **not a calibrated fraud probability**; the supervised probability is also uncalibrated on real data.
-
-## What is implemented
-
-| Component | Implementation |
-|---|---|
-| Features | 5-minute velocity/count and amount sum, 24-hour rolling amount ratio/device history, foreign flag, cyclical hour |
-| Models | XGBoost classifier, Isolation Forest fitted on legitimate training rows |
-| Decision policy | 95% classifier probability + 5% anomaly percentile; validation-selected BLOCK threshold; lower REVIEW threshold; transparent review rules |
-| Explanations | Native XGBoost Tree SHAP, top positive supervised log-odds contributions |
-| API | FastAPI, validation, API key, readiness, replay and conflict handling |
-| Streaming | Kafka-compatible broker, account-keyed producer, manual offsets, malformed/late/conflicting-event DLQ |
-| State | SQLite WAL ledger + account history + decision outbox in one transaction |
-| Cache | Optional Redis decision-read mirror; cache outages do not change scoring correctness |
-| Monitoring | Prometheus counters and full request histogram, PSI, feedback PR-AUC/precision/recall/FPR, dashboard |
-| Model lifecycle | Immutable artifact versions, checksum, atomic pointer, validation gates, champion comparison, rollback |
-| Retraining | Drift-triggered candidate CLI against supplied mature-label CSV; explicit promotion |
-| Experiment tracking | Optional MLflow logging of params, metrics and artifacts |
-| Delivery | Docker Compose, GitHub Actions tests/image build, single-replica Kubernetes reference, AKS guide |
-
-**Intentionally excluded:** distributed feature-store architecture, automatic online canary traffic routing, Evidently integration, automatic scheduling of retraining, cloud provisioning and a managed Azure ML endpoint. The simpler implemented components are named accurately.
-
-## Train using your own labelled dataset
-
-CSV columns:
-
-`transaction_id,account_id,timestamp,amount,device_id,country,home_country,is_fraud`
-
-Use `is_fraud` equal to `0` or `1`; sort order is enforced by timestamp. Include only mature labels and a representative population of legitimate transactions. Review-only labels create selection bias.
-
-```bash
-python -m scripts.generate_csv --output data/labelled.csv --seed 51
-python -m fraud.train --dataset data/labelled.csv
-```
-
-This retains a candidate without affecting the current model. Inspect `models/<version>/report.json`. To train and promote when gates pass:
-
-```bash
-python -m fraud.train --dataset data/labelled.csv --promote
-python -m fraud.train --rollback
-```
-
-Promotion checks validation PR-AUC ≥ 0.15, recall ≥ 0.10, model BLOCK FPR ≤ 1%, and PR-AUC no more than 0.02 below the current champion on the same validation rows. These are **demo gates**, not business acceptance criteria. No threshold/gate uses the test holdout. A champion previously trained on the comparison data would invalidate that comparison; supply a fresh non-overlapping validation window for a defensible real release. Retraining and promotion commands must be single-writer operations.
-
-Drift-triggered candidate training:
-
-```bash
-python -m fraud.retrain --dataset data/labelled.csv
-```
-
-No drift → no candidate. `--force` overrides the trigger. Schedule this command externally only after defining label-maturity and evaluation policy; it never promotes automatically.
-
-## Optional MLflow
-
-```bash
-docker compose --profile tracking up -d mlflow
-pip install mlflow==2.22.0
-export MLFLOW_TRACKING_URI=http://localhost:5000
-python -m fraud.train --dataset data/labelled.csv
-```
-
-Open http://localhost:5000. MLflow is an experiment log; the local immutable-artifact registry owns serving. MLflow is optional and its service is not tested in this environment.
-
-## Repository guide
-
-- `fraud/`: training, feature code, model lifecycle, scoring API, SQL state, streaming, monitoring and retraining
-- `web/index.html`: operations dashboard with scoring, explanations and reviewer feedback
-- `scripts/`: labelled CSV generator, serial HTTP demo, bounded load/security checks, benchmark reproduction and browser parity verification
-- `hosted-demo/`: static browser inference demo, separate from the Docker backend
-- `tests/`: correctness and API regression checks
-- `deploy/`: Kubernetes reference manifest and Azure deployment guide
-- `docs/ARCHITECTURE.md`: dataflow, design decisions, guarantees and tradeoffs
-- `docs/RUNBOOK.md`: failure recovery, model rollback and monitoring interpretation
-- `docs/INTERVIEW_GUIDE.md`: architecture explanation and honest resume wording
-- `docs/VALIDATION.md`: measured validation and limitations
-
-Technical references: [FastAPI lifespan tests](https://fastapi.tiangolo.com/advanced/testing-events/), [Confluent Python consumer](https://docs.confluent.io/kafka-clients/python/current/overview.html), [Redis transactions](https://redis.io/docs/latest/develop/using-commands/transactions/). Dependencies are pinned for this project, not asserted to be the latest versions. Linux x86_64 installs the official CPU-only XGBoost 3.0.0 package to avoid unused GPU dependencies; other platforms retain XGBoost 3.0.0.
-
-## License
-
-Repository code uses the [MIT license](LICENSE). External data retains the source terms described in the benchmark documentation.
+Next: representative mature-label calibration/threshold economics, event-time/persistence requirements and sustained concurrency/crash validation. Repository code uses the existing [MIT license](LICENSE); external datasets retain their source terms.

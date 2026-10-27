@@ -1,0 +1,8 @@
+# Keep the reviewed Docker-input bytes identical on Windows and Linux.
+Dockerfile.demo text eol=lf
+requirements-linux-py312.lock text eol=lf
+fraud/*.py text eol=lf
+scripts/serve_demo.py text eol=lf
+scripts/verify_demo_deployment.py text eol=lf
+web/index.html text eol=lf
+deploy/image-source.json text eol=lf

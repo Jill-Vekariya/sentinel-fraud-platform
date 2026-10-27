@@ -121,7 +121,16 @@ def main():
             capabilities_dropped=True,
             http=http,
         )
+        before_restart_url = url
         docker("restart", name)
+        # Docker may allocate a different host port when an ephemeral mapping restarts.
+        port = docker("port", name, "10000/tcp").strip().rsplit(":", 1)[1]
+        url = "http://127.0.0.1:" + port
+        result.update(
+            endpoint_before_restart=before_restart_url,
+            endpoint_after_restart=url,
+            host_port_changed_on_restart=url != before_restart_url,
+        )
         ready(url)
         req = urllib.request.Request(
             url + "/v1/decisions/" + http["first_transaction_id"], headers={"X-API-Key": key}

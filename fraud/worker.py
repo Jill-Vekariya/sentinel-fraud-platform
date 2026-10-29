@@ -4,8 +4,9 @@ import os
 import json
 import time
 import logging
+import sqlite3
 import httpx
-from confluent_kafka import Consumer, Producer
+from confluent_kafka import Consumer, Producer, KafkaException
 from .config import API_KEY, DATA
 from .store import Store
 from .schema import Transaction
@@ -29,8 +30,15 @@ def publish(producer, topic, key, payload):
 
 def drain_outbox(store, producer):
     for row in store.pending():
-        publish(producer, "decisions", row["id"], json.loads(row["payload"]))
-        store.delivered(row["id"])
+        attempt = store.begin_delivery(row["id"])
+        try:
+            publish(producer, "decisions", row["id"], json.loads(row["payload"]))
+        except (RuntimeError, KafkaException, BufferError) as exc:
+            store.finish_delivery(attempt, row["id"], type(exc).__name__)
+            raise
+        # Broker acknowledgement and SQL commit cannot be atomic. A crash here
+        # permits another publication with the same event key after restart.
+        store.finish_delivery(attempt, row["id"])
 
 
 def process_message(consumer, producer, client, msg):
@@ -80,6 +88,33 @@ def process_message(consumer, producer, client, msg):
     consumer.commit(message=msg, asynchronous=False)
 
 
+def run_loop(consumer, producer, client, store, *, stopped=lambda: False, wait=time.sleep):
+    failures = 0
+    while not stopped():
+        try:
+            drain_outbox(store, producer)
+            msg = consumer.poll(1)
+            if msg is not None:
+                process_message(consumer, producer, client, msg)
+            failures = 0
+        except (
+            KafkaException,
+            BufferError,
+            RuntimeError,
+            httpx.HTTPError,
+            sqlite3.OperationalError,
+        ) as exc:
+            failures += 1
+            delay = min(5.0, 0.5 * 2 ** min(failures - 1, 4))
+            log.warning(
+                "stream_retry error_type=%s failures=%s delay_seconds=%s",
+                type(exc).__name__,
+                failures,
+                delay,
+            )
+            wait(delay)
+
+
 def main():
     logging.basicConfig(level=logging.INFO)
     bootstrap = os.getenv("KAFKA_BOOTSTRAP", "localhost:9092")
@@ -102,11 +137,7 @@ def main():
             timeout=10,
             trust_env=False,
         ) as client:
-            while True:
-                drain_outbox(store, producer)
-                msg = consumer.poll(1)
-                if msg is not None:
-                    process_message(consumer, producer, client, msg)
+            run_loop(consumer, producer, client, store)
     finally:
         consumer.close()
 

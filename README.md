@@ -80,3 +80,7 @@ The [prepared single-service deployment](docs/DEPLOYMENT_DEMO.md) excludes the b
 Implementation, tests, evaluation and documentation used AI assistance. [OWNERSHIP.md](docs/OWNERSHIP.md) records personal work only when confirmed. No production customers, fraud savings or independent authorship are inferred from these demonstrations.
 
 Next: representative mature-label calibration/threshold economics, event-time/persistence requirements and sustained concurrency/crash validation. Repository code uses the existing [MIT license](LICENSE); external datasets retain their source terms.
+
+## Streaming recovery evidence
+
+The [Stage 4 recovery procedure](docs/STAGE4_STREAM_RECOVERY.md) exercises broker disconnection and replay with durable publication-attempt history. Output delivery is at least once; downstream consumers must deduplicate by event identity.

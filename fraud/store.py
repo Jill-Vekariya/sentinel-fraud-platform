@@ -27,6 +27,9 @@ class Store:
                 features TEXT NOT NULL, result TEXT NOT NULL, created REAL NOT NULL);
             CREATE TABLE IF NOT EXISTS feedback(id TEXT PRIMARY KEY REFERENCES decisions(id), label INTEGER, source TEXT, updated REAL);
             CREATE TABLE IF NOT EXISTS outbox(id TEXT PRIMARY KEY REFERENCES decisions(id), payload TEXT, delivered INTEGER DEFAULT 0);
+            CREATE TABLE IF NOT EXISTS outbox_attempts(
+                attempt_id INTEGER PRIMARY KEY, event_id TEXT NOT NULL REFERENCES outbox(id),
+                started REAL NOT NULL, finished REAL, status TEXT NOT NULL, error_type TEXT);
             CREATE INDEX IF NOT EXISTS decision_time ON decisions(created);
             """)
 
@@ -129,3 +132,30 @@ class Store:
     def delivered(self, tid):
         with self.connect() as db:
             db.execute("UPDATE outbox SET delivered=1 WHERE id=?", (tid,))
+
+    def begin_delivery(self, tid):
+        """A crash leaves an explicit uncertain attempt; the event stays pending."""
+        with self.connect() as db:
+            return db.execute(
+                "INSERT INTO outbox_attempts(event_id,started,status) VALUES(?,?,'publishing')",
+                (tid, time.time()),
+            ).lastrowid
+
+    def finish_delivery(self, attempt_id, tid, error_type=None):
+        with self.connect() as db:
+            db.execute("BEGIN IMMEDIATE")
+            cursor = db.execute(
+                "UPDATE outbox_attempts SET finished=?,status=?,error_type=? "
+                "WHERE attempt_id=? AND event_id=? AND status='publishing'",
+                (
+                    time.time(),
+                    "unconfirmed" if error_type else "confirmed",
+                    error_type,
+                    attempt_id,
+                    tid,
+                ),
+            )
+            if cursor.rowcount != 1:
+                raise ValueError("Delivery attempt identity/state mismatch")
+            if error_type is None:
+                db.execute("UPDATE outbox SET delivered=1 WHERE id=?", (tid,))

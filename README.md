@@ -23,6 +23,10 @@ return the original decision and model version; conflicting payloads return 409.
 cost explorer is separate, and neither runs the Python/Kafka backend.
 [Demo transcript](docs/DASHBOARD_DEMO.md) · [Browser parity](docs/browser-model-parity.json).
 
+## Further engineering checks
+
+[Streaming recovery](docs/STAGE4_STREAM_RECOVERY.md) retains uncertain delivery attempts and retries a failed input before polling a later offset.
+
 ## Architecture
 
 ```mermaid

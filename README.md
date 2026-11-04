@@ -1,12 +1,31 @@
 # Sentinel
 
-**Fraud scoring with transactional decisions, replay safety and an explicit at-least-once streaming contract.**
+**Fraud scoring with repeatable decisions and explicit streaming guarantees.**
 
-Sentinel combines XGBoost output, an Isolation Forest anomaly percentile and review rules. One SQLite transaction checks event identity, computes features from bounded account history and commits the decision, history and output outbox together. Optional Kafka-compatible input and Redis reads extend the local API without making them correctness authorities.
+Sentinel combines an XGBoost classifier, an Isolation Forest anomaly signal
+and review rules. One SQLite transaction checks event identity and commits
+account history, the decision and an output outbox together. Identical retries
+return the original decision and model version; conflicting payloads return 409.
 
-[Browser demo](https://jill-vekariya.github.io/sentinel-fraud-platform/) · [Dashboard video](docs/sentinel-dashboard-demo.mp4) · [Interview guide](docs/INTERVIEW.md) · [Real-data benchmark](docs/REAL_BENCHMARK.md)
+[Try the browser demo](https://jill-vekariya.github.io/sentinel-fraud-platform/) · [Real-data benchmark](docs/REAL_BENCHMARK.md) · [Architecture](docs/ARCHITECTURE.md) · [Code walkthrough](docs/INTERVIEW.md)
 
-The browser edition runs exported synthetic inference and classifier explanations, plus a separate real-data cost explorer. It does not host the Python/Kafka backend. [Demo/transcript](docs/DASHBOARD_DEMO.md) · [Browser model parity](docs/browser-model-parity.json).
+## Two parts to inspect
+
+- **Offline evaluation:** five approaches on 284,807 anonymized transactions,
+  using chronological splits and validation-selected thresholds. The recorded
+  XGBoost holdout PR-AUC is **0.7639**; assumed financial costs are scenario
+  calculations, not realized savings.
+- **Serving semantics:** account-keyed input, idempotent decisions and a
+  transactional outbox. Output delivery is at least once; consumers must
+  deduplicate after a publisher crash.
+
+**Demo scope:** browser inference uses an exported synthetic model. The real-data
+cost explorer is separate, and neither runs the Python/Kafka backend.
+[Demo transcript](docs/DASHBOARD_DEMO.md) · [Browser parity](docs/browser-model-parity.json).
+
+## Further engineering checks
+
+[Streaming recovery](docs/STAGE4_STREAM_RECOVERY.md) retains uncertain delivery attempts and retries a failed input before polling a later offset.
 
 ## Architecture
 
@@ -80,7 +99,3 @@ The [prepared single-service deployment](docs/DEPLOYMENT_DEMO.md) excludes the b
 Implementation, tests, evaluation and documentation used AI assistance. [OWNERSHIP.md](docs/OWNERSHIP.md) records personal work only when confirmed. No production customers, fraud savings or independent authorship are inferred from these demonstrations.
 
 Next: representative mature-label calibration/threshold economics, event-time/persistence requirements and sustained concurrency/crash validation. Repository code uses the existing [MIT license](LICENSE); external datasets retain their source terms.
-
-## Streaming recovery evidence
-
-The [Stage 4 recovery procedure](docs/STAGE4_STREAM_RECOVERY.md) exercises broker disconnection and replay with durable publication-attempt history. Output delivery is at least once; downstream consumers must deduplicate by event identity.

@@ -6,6 +6,12 @@ at five seconds. It never commits an input offset on an unconfirmed scoring/DLQ
 operation. Draining pending outbox records precedes polling new work; prolonged
 outages can therefore cause consumer-group rebalances and input replay.
 
+The worker retains the currently polled input across retryable failures and does
+not poll or commit a later offset until that input succeeds. An empty producer
+queue alone does not confirm delivery: a successful delivery callback is required.
+Regression checks cover a failed offset followed by another valid input and an
+empty queue with no observed callback.
+
 `outbox_attempts` records intent before publication and confirms delivery in the
 same SQL transaction that marks the event delivered. A crash after broker
 acknowledgement and before that transaction leaves a `publishing` attempt and a

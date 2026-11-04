@@ -31,6 +31,7 @@ def message(body=None):
 def producer(fail=False):
     p = Mock()
     p.flush.return_value = int(fail)
+    p.produce.side_effect = lambda *args, **kwargs: kwargs["on_delivery"](None, Mock())
     return p
 
 

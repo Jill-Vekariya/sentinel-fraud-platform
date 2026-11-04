@@ -1,6 +1,6 @@
 {
-  "base_commit": "fc290021b9b00c19cead9ce7ed07ff04555b0f85",
-  "input_sha256": "1dfce05649f1a2cd9a784cfb9f96202cc6a4cddd74743ef71482b5b6ea66acf4",
+  "base_commit": "893551860e172a15efc9d978973baa83959bc989",
+  "input_sha256": "f1879e7ded1639bc997444b10a5132211d5a61689c7b4a1593e613a1072ace08",
   "files": {
     "Dockerfile.demo": "49be48a94ecee2c748d6d49d7955b0036cc37d9be838684af619c6d3526a1bd3",
     "fraud/__init__.py": "27e8febb48ada44153ea2add9969a2c50a9831a74d9755fdd53c549a888b1cc2",
@@ -14,10 +14,10 @@
     "fraud/produce.py": "103eae0316e341f5b05fc92b8afdc6846c375f4d1c87f262160319c89b0905c7",
     "fraud/retrain.py": "5a03455bdd6487b2dd1d05cb522eb6cd17ef39f44fdb909f7ecb819fa7d14b47",
     "fraud/schema.py": "2496769513c033f7d4436518e20d5e75e053328a6c3587371224b34766c9769b",
-    "fraud/store.py": "3e71f27613d800bdb25eb79da2d971e23af3e5db8a4914f4163e12528e0268af",
+    "fraud/store.py": "c026fe3140bd9747a032c770c61c6f3fa70d51c46ef8ed901ebcca3bc50a34ea",
     "fraud/train.py": "2a0060e0b8d5369e7d134af17ab142abfc848ba831b6cc115a829cb0b636d865",
-    "fraud/worker.py": "d281ec030c4601134939514bc607ea166dd8f0491e7fe3249679d6f38e82e294",
-    "requirements-linux-py312.lock": "75c51dae0e7767abdf34f5789f33e6c41dbf66802fb16443378e316491256497",
+    "fraud/worker.py": "165ee2c7334437d25b47becd7138cc0f15f6a7cb16d31cd025c527642d53882f",
+    "requirements-linux-py312.lock": "5e2c95395bdd54a19d188370cc817a3da3b42da47336d1d4748d14d928831e05",
     "scripts/serve_demo.py": "ccd2440c5722e23f2af07bfed1fb9f002cd946477b21bf4006fea8d7114f9a68",
     "scripts/verify_demo_deployment.py": "0e4bf5271a4df589e932bbcdc91f1b9df0b812c17c66a51cdcc66e370e5eb6c1",
     "web/index.html": "72f49c69f3d01330321bd2d800aa357acca384eaca550de0a07531bbb06e7991"

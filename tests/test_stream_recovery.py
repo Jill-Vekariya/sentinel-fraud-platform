@@ -67,6 +67,7 @@ def test_disconnect_and_restart_retain_attempts_and_event_identity(tmp_path):
     store, tx, manager = setup(tmp_path)
     store.score(tx, manager)
     producer = Mock()
+    producer.produce.side_effect = lambda *args, **kwargs: kwargs["on_delivery"](None, Mock())
     producer.flush.return_value = 1
     with pytest.raises(RuntimeError):
         drain_outbox(store, producer)

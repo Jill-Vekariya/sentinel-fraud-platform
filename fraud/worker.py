@@ -17,14 +17,23 @@ log = logging.getLogger(__name__)
 
 def publish(producer, topic, key, payload):
     errors = []
+    acknowledged = False
+
+    def delivered(error, message):
+        nonlocal acknowledged
+        if error is not None:
+            errors.append(error)
+        else:
+            acknowledged = True
+
     producer.produce(
         topic,
         key=key,
         value=json.dumps(payload),
-        on_delivery=lambda err, msg: errors.append(err) if err else None,
+        on_delivery=delivered,
     )
     remaining = producer.flush(10)
-    if remaining or errors:
+    if remaining or errors or not acknowledged:
         raise RuntimeError("Kafka delivery unconfirmed; retry without committing offset")
 
 
@@ -90,12 +99,18 @@ def process_message(consumer, producer, client, msg):
 
 def run_loop(consumer, producer, client, store, *, stopped=lambda: False, wait=time.sleep):
     failures = 0
+    pending_message = None
     while not stopped():
         try:
             drain_outbox(store, producer)
-            msg = consumer.poll(1)
-            if msg is not None:
-                process_message(consumer, producer, client, msg)
+            if pending_message is None:
+                pending_message = consumer.poll(1)
+            if pending_message is not None:
+                # poll advances the local position. Keep a failed input until its
+                # scoring/DLQ operation and offset commit both succeed; committing
+                # a later message would otherwise acknowledge the failed one too.
+                process_message(consumer, producer, client, pending_message)
+                pending_message = None
             failures = 0
         except (
             KafkaException,

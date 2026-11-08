@@ -48,7 +48,7 @@ flowchart TD
   S --> F["Feedback and monitoring"]
 ```
 
-[Architecture and trade-offs](docs/ARCHITECTURE.md) · [Validation conditions](docs/VALIDATION.md)
+[Design decisions](docs/DESIGN_DECISIONS.md) · [Architecture and trade-offs](docs/ARCHITECTURE.md) · [Validation conditions](docs/VALIDATION.md)
 
 ## Quick start
 

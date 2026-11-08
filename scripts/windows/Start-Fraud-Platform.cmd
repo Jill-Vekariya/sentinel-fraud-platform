@@ -1,5 +1,5 @@
 @echo off
-cd /d "%~dp0"
+cd /d "%~dp0\..\.."
 docker compose up -d
 if errorlevel 1 (
   echo Startup failed. Check Docker Desktop is running.

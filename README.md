@@ -1,31 +1,37 @@
-# Sentinel
+# Sentinel — fraud scoring with repeatable decisions and honest streaming guarantees
 
-**Fraud scoring with repeatable decisions and explicit streaming guarantees.**
+[![CI](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/workflows/ci.yml/badge.svg)](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/workflows/ci.yml)
+![Python 3.12](https://img.shields.io/badge/python-3.12-blue)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-Sentinel combines an XGBoost classifier, an Isolation Forest anomaly signal
-and review rules. One SQLite transaction checks event identity and commits
-account history, the decision and an output outbox together. Identical retries
-return the original decision and model version; conflicting payloads return 409.
+**[Try the browser demo](https://jill-vekariya.github.io/sentinel-fraud-platform/)** · [Real-data benchmark](docs/REAL_BENCHMARK.md) · [Architecture](docs/ARCHITECTURE.md) · [Code walkthrough](docs/INTERVIEW.md)
 
-[Try the browser demo](https://jill-vekariya.github.io/sentinel-fraud-platform/) · [Real-data benchmark](docs/REAL_BENCHMARK.md) · [Architecture](docs/ARCHITECTURE.md) · [Code walkthrough](docs/INTERVIEW.md)
+## The problem
 
-## Two parts to inspect
+A fraud model is only half of a fraud system. The other half is the plumbing: a payment that gets retried must receive the same decision it got the first time, a crashed publisher must not lose a decision, and the account history the model scores against must be updated atomically with the decision itself. Sentinel is a complete scoring service that takes those guarantees seriously, on top of a model evaluated on real anonymised card transactions.
 
-- **Offline evaluation:** five approaches on 284,807 anonymized transactions,
-  using chronological splits and validation-selected thresholds. The recorded
-  XGBoost holdout PR-AUC is **0.7639**; assumed financial costs are scenario
-  calculations, not realized savings.
-- **Serving semantics:** account-keyed input, idempotent decisions and a
-  transactional outbox. Output delivery is at least once; consumers must
-  deduplicate after a publisher crash.
+## What I built
 
-**Demo scope:** browser inference uses an exported synthetic model. The real-data
-cost explorer is separate, and neither runs the Python/Kafka backend.
-[Demo transcript](docs/DASHBOARD_DEMO.md) · [Browser parity](docs/browser-model-parity.json).
+- **The model:** an XGBoost classifier blended (95/5) with an Isolation Forest anomaly signal and review rules, with Tree SHAP explanations for the classifier margin.
+- **The offline benchmark:** five approaches on the 284,807-row anonymised card dataset, chronological splits, validation-selected thresholds, and a cost explorer for assumed fraud/false-positive costs.
+- **Idempotent decisions:** identical retries return the original decision and model version; a changed payload under the same ID returns HTTP 409; events older than the account watermark are rejected.
+- **A transactional outbox:** account history, decision and outbound event commit in one SQLite transaction, then publish to a Kafka-compatible stream at least once. A worker that fails on a message retains it instead of polling past it.
+- **Operations:** versioned model promotion with validation gates, feedback ingestion, PSI drift heuristics, an optional Redis read mirror, and a browser demo with a parity check against the Python model.
 
-## Further engineering checks
+## Results
 
-[Streaming recovery](docs/STAGE4_STREAM_RECOVERY.md) retains uncertain delivery attempts and retries a failed input before polling a later offset.
+| Measurement | Result | Scope |
+| --- | --- | --- |
+| [Real-data benchmark](docs/REAL_BENCHMARK.md) | **XGBoost holdout PR-AUC 0.7639** on 284,807 transactions | Chronological split; cost figures are scenarios, not realised savings |
+| [Bounded load test](docs/LOAD_SECURITY.md) | 300/300 requests in two runs; p95 987 ms and 1,269 ms with ten clients | Single local API; no latency SLA claimed |
+| [Broker verification](docs/FINAL_VERIFICATION.md) | 100 transactions scored and consumed end to end | Local Docker with Redpanda |
+| [Streaming recovery](docs/STAGE4_STREAM_RECOVERY.md) | Failed input retried before a later offset; uncertain deliveries retained | Regression tests failed before the fix and pass after |
+
+## Where this applies
+
+- **Payments and fintech:** UPI and card processors face exactly this retry-and-duplicate problem; idempotency keys and outbox patterns are what their APIs are built on.
+- **Any event-driven ML service:** the "decide once, publish at least once, let consumers deduplicate" contract applies to credit decisions, content moderation and alerting alike.
+- **Model governance:** promotion gates, versioned artifacts and feedback-joined-to-version are the parts regulators and risk teams ask about.
 
 ## Architecture
 
@@ -42,60 +48,44 @@ flowchart TD
   S --> F["Feedback and monitoring"]
 ```
 
-Identical retries replay the original decision/model version; changed payloads under the same ID return 409. Events older than the account watermark are rejected. Publication and SQL delivery marking are separate, so output can duplicate after a crash; downstream consumers must deduplicate. [Architecture and trade-offs](docs/ARCHITECTURE.md).
+[Architecture and trade-offs](docs/ARCHITECTURE.md) · [Validation conditions](docs/VALIDATION.md)
 
-## Quick start: API without a broker
+## Quick start
 
-Requires Git, Python 3.12 and dependency-download access. Linux x86-64 commands, from a new clone:
+Requires Python 3.12 (Linux x86-64 for the hash-locked install; other platforms see the [runbook](docs/RUNBOOK.md)).
 
 ```bash
 git clone https://github.com/Jill-Vekariya/sentinel-fraud-platform.git
 cd sentinel-fraud-platform
 python3.12 -m venv .venv
 .venv/bin/python -m pip install --require-hashes -r requirements-linux-py312.lock
-.venv/bin/python -m fraud.train --promote
-.venv/bin/python -m uvicorn fraud.api:app --host 127.0.0.1 --port 8000
+.venv/bin/python -m fraud.train --promote                       # trains and promotes a synthetic model
+.venv/bin/python -m uvicorn fraud.api:app --host 127.0.0.1 --port 8000   # http://127.0.0.1:8000/docs
 ```
 
-Open `http://127.0.0.1:8000`; the API explorer is `/docs`. The local demo key is `local-demo-change-me`. Training creates a synthetic model first; a Git clone does not include generated model files. Other platforms use the separately resolved `requirements.txt` path in [the runbook](docs/RUNBOOK.md), rather than claiming the Linux wheel lock verifies Windows.
+Local demo key: `local-demo-change-me`. In a second terminal, `.venv/bin/python -m scripts.demo --count 200` scores synthetic events. Full streaming topology with Docker: [walkthrough](docs/DEMO_WALKTHROUGH.md). Windows launchers: [`scripts/windows/`](scripts/windows/). Tests: `.venv/bin/python -m pytest -q`. Everything else: [reference guide](docs/REFERENCE.md).
 
-In a second terminal, run `.venv/bin/python -m scripts.demo --count 200` for a local serial scoring/feedback example. It uses synthetic events and prints that run's HTTP timings. Existing checkouts should use owned `DATA_DIR`/`MODEL_DIR` paths and retain previous models/data.
+## What I learned
 
-For the full streaming topology, start Docker Linux/Compose v2 and follow [the walkthrough](docs/DEMO_WALKTHROUGH.md): create `.env` only if absent, run `docker compose up --build -d`, then `docker compose run --rm --no-deps producer`. Stop with `docker compose down`, preserving volumes. The trainer precedes API startup; producer messages are keyed by account. Reusing explicit producer seeds can conflict with old IDs.
+<!-- Rewrite these in your own words before you point a recruiter here. Short, specific, first person. -->
 
-## Results and verification
+- Exactly-once delivery is a promise you cannot keep across a crash; design for duplicates and say so.
+- An empty producer queue is not proof of delivery. The fix was requiring a delivery callback.
+- PR-AUC on a chronological split tells a much less flattering story than ROC-AUC on a random one, and it is the right story.
 
-| Evidence | Recorded observation | Limit |
-| --- | --- | --- |
-| [Historical broker verification](docs/FINAL_VERIFICATION.md) | 100 transactions scored and decision output consumed | Local Docker/Redpanda integration at the recorded source |
-| [Bounded load](docs/LOAD_SECURITY.md) | Two runs completed 300/300 requests each; ten-client p95 987 ms and 1,269 ms | Single local API, bounded workload; no guaranteed sub-100 ms latency |
-| [Real-data benchmark](docs/REAL_BENCHMARK.md) | Five approaches on 284,807 anonymized rows, chronological splits and validation-selected thresholds | Offline PCA-feature models differ from the synthetic serving model; cost scenarios are assumptions |
-| [Stage 4 local review](docs/INTERVIEW.md) | 21 selected transactional/API/boundary/mocked-stream tests passed | No new broker, external financial event or production outcome |
+## Limits
 
-For development, after runtime installation:
+- The 95/5 blend is a ranking signal, not a calibrated fraud probability.
+- Account histories keep at most 24 hours / 1,000 events; very high-rate accounts lose part of their window.
+- Single serialised SQLite writer; Redis is a disposable mirror, not a second ledger.
+- Model artifacts are pickles: load only ones you built. Checksums do not make hostile files safe.
 
-```bash
-.venv/bin/python -m pip install -r requirements-dev.txt
-.venv/bin/python -m pytest -q
-.venv/bin/python -m ruff check fraud scripts tests
-.venv/bin/python -m ruff format --check fraud scripts tests
-python scripts/check_links.py
-```
+[Operating limits in full](docs/REFERENCE.md#operating-limits) · [Deployment demo](docs/DEPLOYMENT_DEMO.md)
 
-[Validation conditions](docs/VALIDATION.md) distinguish synthetic holdout, real-data offline evaluation, browser parity and HTTP measurements. [Current status](docs/CURRENT_STATUS.md) documents optional DOM checks. A configured workflow is not evidence of a successful run at a later revision.
+## How this was built
 
-## Operating limits
+I used AI coding assistants throughout this project. [HOW_THIS_WAS_BUILT.md](docs/HOW_THIS_WAS_BUILT.md) explains what was assisted, what I verified myself, and what I am still working through. The full attribution record is in [OWNERSHIP.md](docs/OWNERSHIP.md).
 
-- Scoring holds a serialized SQLite writer transaction. Redis is a disposable mirror, not a second authoritative ledger. Account histories retain at most 24 hours/1,000 events; high-rate accounts can lose part of their window through truncation.
-- The 95/5 classifier/anomaly blend is a ranking signal, not a calibrated fraud-loss probability. Tree SHAP explains the classifier margin, not the anomaly component, rules or causal effects.
-- Feedback can be selectively labeled; PSI is an investigation heuristic. Retraining creates candidates, with explicit promotion and demo validation gates. There is no automatic scheduling/promotion.
-- Production mode requires `FRAUD_ENV=production` and a private non-demo `API_KEY` of at least 24 characters. Actual bodies are capped at 65,536 bytes before parsing. These guards do not establish a complete public security/retention policy.
-- Load only trusted local model artifacts: checksums do not make attacker-controlled pickle files safe. Concurrent model promoters and shared outbox publishers need additional coordination.
+## License
 
-The [prepared single-service deployment](docs/DEPLOYMENT_DEMO.md) excludes the broker/publisher, runs one API worker and uses temporary SQLite. Its earlier native check is not proof of a newly built/capped image or public backend. Check the exact build/deployment receipt before making those claims.
-
-## Ownership, next work and license
-
-Implementation, tests, evaluation and documentation used AI assistance. [OWNERSHIP.md](docs/OWNERSHIP.md) records personal work only when confirmed. No production customers, fraud savings or independent authorship are inferred from these demonstrations.
-
-Next: representative mature-label calibration/threshold economics, event-time/persistence requirements and sustained concurrency/crash validation. Repository code uses the existing [MIT license](LICENSE); external datasets retain their source terms.
+[MIT](LICENSE). The anonymised transaction dataset keeps its source terms.

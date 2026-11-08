@@ -1,4 +1,4 @@
-# A three-minute internship demo
+# A three-minute demo walkthrough
 
 1. Open the [public demo](https://jill-vekariya.github.io/sentinel-fraud-platform/). Explain that it runs an exported synthetic model in the browser, while the complete backend runs in Docker.
 2. Select **Normal payment**, then **Foreign amount spike**. Show the decisions, prior account features, explicit rule reasons and classifier contributions. Explain that contributions describe the classifier in log-odds, not causation or the anomaly component.

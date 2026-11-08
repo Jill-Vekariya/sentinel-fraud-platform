@@ -21,7 +21,7 @@ A later [fresh-checkout checklist](FINAL_CHECKLIST.md) repeated startup with new
 | Concurrent replay | 20 requests returned one new decision and 19 replays; exactly one ledger row and one outbox row |
 | Basic security | 27 checks passed after fixing non-ASCII key and overflowing-number errors |
 | Recorded demonstration | 48-second captioned visualization of captured Docker API requests, decisions and classifier explanations |
-| Feature freeze | Scope and remaining limitations recorded in [RELEASE_FREEZE.md](RELEASE_FREEZE.md) |
+| Feature freeze | Scope frozen after the six release checks above; remaining limitations are recorded in this document |
 
 The maximum benchmark difference was 6.776263578034403e-21. Dataset SHA-256: `76274b691b16a6c49d3f159c883398e03ccd6d1ee12d9d8ee38f4b4b98551a89`. The original aggregate benchmark remains unchanged. Reports: [live](live-verification.json), [restart](restart-verification.json), [benchmark reproduction](benchmark-reproduction-check.json), [Docker dashboard](dashboard-test.json), [browser DOM checks](hosted-demo-test.json) and [load/security with captured demo responses](load-security.json).
 

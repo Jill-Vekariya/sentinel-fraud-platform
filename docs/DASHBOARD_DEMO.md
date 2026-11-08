@@ -19,4 +19,4 @@ The classifier explanation does not cover anomaly scoring or policy rules and is
 
 The separate [48-second Docker API walkthrough](sentinel-demo.mp4) visualizes captured API requests/responses rather than dashboard footage. [Its provenance](DEMO_TRANSCRIPT.md) and the [full pipeline checklist](FINAL_CHECKLIST.md) provide supporting backend evidence.
 
-Both videos are hosted in GitHub. No YouTube account or placeholder video link is required. For an interview, reproduce the interactions using [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md) and explain the implementation with [INTERVIEW_GUIDE.md](INTERVIEW_GUIDE.md).
+Both videos are hosted in GitHub. No YouTube account or placeholder video link is required. To reproduce the interactions, follow [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md).

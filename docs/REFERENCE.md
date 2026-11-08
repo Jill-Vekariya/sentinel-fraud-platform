@@ -9,7 +9,7 @@ and review rules. One SQLite transaction checks event identity and commits
 account history, the decision and an output outbox together. Identical retries
 return the original decision and model version; conflicting payloads return 409.
 
-[Try the browser demo](https://jill-vekariya.github.io/sentinel-fraud-platform/) · [Real-data benchmark](REAL_BENCHMARK.md) · [Architecture](ARCHITECTURE.md) · [Code walkthrough](INTERVIEW.md)
+[Try the browser demo](https://jill-vekariya.github.io/sentinel-fraud-platform/) · [Real-data benchmark](REAL_BENCHMARK.md) · [Architecture](ARCHITECTURE.md) · [Runbook](RUNBOOK.md)
 
 ## Two parts to inspect
 
@@ -72,7 +72,7 @@ For the full streaming topology, start Docker Linux/Compose v2 and follow [the w
 | [Historical broker verification](FINAL_VERIFICATION.md) | 100 transactions scored and decision output consumed | Local Docker/Redpanda integration at the recorded source |
 | [Bounded load](LOAD_SECURITY.md) | Two runs completed 300/300 requests each; ten-client p95 987 ms and 1,269 ms | Single local API, bounded workload; no guaranteed sub-100 ms latency |
 | [Real-data benchmark](REAL_BENCHMARK.md) | Five approaches on 284,807 anonymized rows, chronological splits and validation-selected thresholds | Offline PCA-feature models differ from the synthetic serving model; cost scenarios are assumptions |
-| [Stage 4 local review](INTERVIEW.md) | 21 selected transactional/API/boundary/mocked-stream tests passed | No new broker, external financial event or production outcome |
+| Stage 4 local review | 21 selected transactional/API/boundary/mocked-stream tests passed | No new broker, external financial event or production outcome |
 
 For development, after runtime installation:
 
@@ -84,7 +84,7 @@ For development, after runtime installation:
 python scripts/check_links.py
 ```
 
-[Validation conditions](VALIDATION.md) distinguish synthetic holdout, real-data offline evaluation, browser parity and HTTP measurements. [Current status](CURRENT_STATUS.md) documents optional DOM checks. A configured workflow is not evidence of a successful run at a later revision.
+[Validation conditions](VALIDATION.md) distinguish synthetic holdout, real-data offline evaluation, browser parity and HTTP measurements. A configured workflow is not evidence of a successful run at a later revision.
 
 ## Operating limits
 
@@ -96,8 +96,8 @@ python scripts/check_links.py
 
 The [prepared single-service deployment](DEPLOYMENT_DEMO.md) excludes the broker/publisher, runs one API worker and uses temporary SQLite. Its earlier native check is not proof of a newly built/capped image or public backend. Check the exact build/deployment receipt before making those claims.
 
-## Ownership, next work and license
+## Next work and license
 
-Implementation, tests, evaluation and documentation used AI assistance. [OWNERSHIP.md](OWNERSHIP.md) records personal work only when confirmed. No production customers, fraud savings or independent authorship are inferred from these demonstrations.
+No production customers or fraud savings are inferred from these demonstrations.
 
 Next: representative mature-label calibration/threshold economics, event-time/persistence requirements and sustained concurrency/crash validation. Repository code uses the existing [MIT license](../LICENSE); external datasets retain their source terms.

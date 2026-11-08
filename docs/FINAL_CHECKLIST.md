@@ -11,7 +11,7 @@ Executed on 2026-10-09 against source commit `14c4a3fb64e0281e27d94e62db0eab2684
 | API security and replay | All 27 selected checks passed; 20 concurrent identical requests produced one decision and one outbox row. Actual API restart preserved the original decision and score |
 | Tracked-file exposure review | No tracked `.env`, `data/` or `models/`; no selected private-key/provider-token signatures found in 83 tracked files. Public demo keys are examples; no complete secret-history or vulnerability audit is claimed |
 | Demonstration | [Actual public dashboard walkthrough](sentinel-dashboard-demo.mp4), plus [captured Docker API walkthrough](sentinel-demo.mp4), each with separate provenance and limitations |
-| README and interview material | Prominent real video/live/source links; setup and measured evidence; [architecture diagram](ARCHITECTURE.md) and [ten implementation-specific answers](INTERVIEW_GUIDE.md) |
+| README and documentation | Prominent real video/live/source links; setup and measured evidence; [architecture diagram](ARCHITECTURE.md) |
 
 ## Leakage review and chronological boundaries
 
@@ -64,4 +64,4 @@ Use the [benchmark protocol](REAL_BENCHMARK.md) for the separately downloaded CS
 
 The subsequent dashboard fix only synchronizes the form with the displayed transaction when selecting examples, simulation results or a previous decision. It changes no training, scoring, threshold or backend persistence code. Its interaction regression checks are included in the [CI workflow](https://github.com/Jill-Vekariya/sentinel-fraud-platform/actions/workflows/ci.yml).
 
-Feature development remains frozen. A portfolio demonstration and a review of selected security cases do not certify a production banking service; [release limitations](RELEASE_FREEZE.md) remain applicable. Practising and explaining the project is the student's remaining preparation task.
+Feature development remains frozen. A portfolio demonstration and a review of selected security cases do not certify a production banking service; the recorded limitations remain applicable.

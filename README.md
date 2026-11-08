@@ -4,7 +4,7 @@
 ![Python 3.12](https://img.shields.io/badge/python-3.12-blue)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-**[Try the browser demo](https://jill-vekariya.github.io/sentinel-fraud-platform/)** · [Real-data benchmark](docs/REAL_BENCHMARK.md) · [Architecture](docs/ARCHITECTURE.md) · [Code walkthrough](docs/INTERVIEW.md)
+**[Try the browser demo](https://jill-vekariya.github.io/sentinel-fraud-platform/)** · [Real-data benchmark](docs/REAL_BENCHMARK.md) · [Architecture](docs/ARCHITECTURE.md) · [Runbook](docs/RUNBOOK.md)
 
 ## The problem
 
@@ -82,9 +82,6 @@ Local demo key: `local-demo-change-me`. In a second terminal, `.venv/bin/python 
 
 [Operating limits in full](docs/REFERENCE.md#operating-limits) · [Deployment demo](docs/DEPLOYMENT_DEMO.md)
 
-## How this was built
-
-I used AI coding assistants throughout this project. [HOW_THIS_WAS_BUILT.md](docs/HOW_THIS_WAS_BUILT.md) explains what was assisted, what I verified myself, and what I am still working through. The full attribution record is in [OWNERSHIP.md](docs/OWNERSHIP.md).
 
 ## License
 

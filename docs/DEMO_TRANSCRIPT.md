@@ -15,4 +15,4 @@ This is a captioned visualization of an actual Docker API session, rendered from
 
 The amount-ratio feature uses a USD 100 reference mean before any history exists. The first event therefore has a ratio of 0.45. The next event uses recent account history and the ratio is clipped to the model's maximum of 100. Native Tree SHAP values describe supervised classifier log-odds; they do not explain the anomaly component or explicit review rules, establish causation, or turn the blended risk score into a calibrated probability.
 
-For a live interview demonstration, follow [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md) and explain the decisions in your own words. The video is supporting evidence, not a substitute for understanding the implementation.
+For a live demonstration, follow [DEMO_WALKTHROUGH.md](DEMO_WALKTHROUGH.md). Use the source and recorded tests to inspect each decision and its operating limits.

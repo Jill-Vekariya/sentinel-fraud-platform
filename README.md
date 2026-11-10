@@ -8,9 +8,9 @@
 
 ## The problem
 
-A fraud model is only half of a fraud system. The other half is the plumbing: a payment that gets retried must receive the same decision it got the first time, a crashed publisher must not lose a decision, and the account history the model scores against must be updated atomically with the decision itself. Sentinel is a complete scoring service that takes those guarantees seriously, on top of a model evaluated on real anonymised card transactions.
+Fraud scoring must stay consistent across retries, concurrent account updates and publisher failures. Sentinel combines an offline fraud-model benchmark with idempotent decisions, atomic account-history updates and a transactional outbox. Its streaming contract is at-least-once delivery, with consumers responsible for deduplication.
 
-## What I built
+## Implementation
 
 - **The model:** an XGBoost classifier blended (95/5) with an Isolation Forest anomaly signal and review rules, with Tree SHAP explanations for the classifier margin.
 - **The offline benchmark:** five approaches on the 284,807-row anonymised card dataset, chronological splits, validation-selected thresholds, and a cost explorer for assumed fraud/false-positive costs.
@@ -65,9 +65,7 @@ python3.12 -m venv .venv
 
 Local demo key: `local-demo-change-me`. In a second terminal, `.venv/bin/python -m scripts.demo --count 200` scores synthetic events. Full streaming topology with Docker: [walkthrough](docs/DEMO_WALKTHROUGH.md). Windows launchers: [`scripts/windows/`](scripts/windows/). Tests: `.venv/bin/python -m pytest -q`. Everything else: [reference guide](docs/REFERENCE.md).
 
-## What I learned
-
-<!-- Rewrite these in your own words before you point a recruiter here. Short, specific, first person. -->
+## Engineering takeaways
 
 - Exactly-once delivery is a promise you cannot keep across a crash; design for duplicates and say so.
 - An empty producer queue is not proof of delivery. The fix was requiring a delivery callback.

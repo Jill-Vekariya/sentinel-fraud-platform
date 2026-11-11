@@ -61,4 +61,4 @@ broker and its anonymous volume were removed successfully. The first broker
 probe failed before outage injection because a temporary Kafka admin client was
 destroyed while topic futures were pending; retaining that client fixed the
 driver. That failed trial and its broker teardown are retained separately.
-Existing ownership and AI-assistance disclosures remain unchanged.
+The [current owner statement](OWNER_REVIEW.md) records sustained personal effort and repeated project review. The implementation evidence and trial outcomes in this report retain their original scope.

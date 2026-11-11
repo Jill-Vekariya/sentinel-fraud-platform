@@ -10,6 +10,10 @@
 
 Fraud scoring must stay consistent across retries, concurrent account updates and publisher failures. Sentinel combines an offline fraud-model benchmark with idempotent decisions, atomic account-history updates and a transactional outbox. Its streaming contract is at-least-once delivery, with consumers responsible for deduplication.
 
+## My involvement
+
+I have invested sustained personal effort in this project and reviewed it repeatedly throughout development. My focus is fraud scoring, repeatable decisions, transactional state updates and recovery of at-least-once event delivery. See [project ownership and review](docs/OWNER_REVIEW.md) for my current statement, review scope and technical references.
+
 ## Implementation
 
 - **The model:** an XGBoost classifier blended (95/5) with an Isolation Forest anomaly signal and review rules, with Tree SHAP explanations for the classifier margin.

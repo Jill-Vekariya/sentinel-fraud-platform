@@ -5,6 +5,7 @@ import os
 import threading
 import tempfile
 import re
+import stat
 from pathlib import Path
 import numpy as np
 import xgboost as xgb
@@ -112,6 +113,11 @@ def point_to(directory, version):
         if (directory / "current.json").exists()
         else {}
     )
+    pointer = directory / "current.json"
+    try:
+        pointer_mode = stat.S_IMODE(pointer.stat().st_mode)
+    except FileNotFoundError:
+        pointer_mode = 0o644
     tmp = None
     try:
         with tempfile.NamedTemporaryFile(
@@ -125,6 +131,7 @@ def point_to(directory, version):
             tmp = Path(handle.name)
             json.dump({"version": version, "previous": current.get("version")}, handle)
             handle.flush()
+            os.chmod(tmp, pointer_mode)
             os.fsync(handle.fileno())
         os.replace(tmp, directory / "current.json")
     finally:

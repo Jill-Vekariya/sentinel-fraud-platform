@@ -77,10 +77,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12'}
+      - name: Freeze source identity for the CI image
+        run: |
+          python scripts/freeze_demo_source.py --write
+          python scripts/freeze_demo_source.py
       - run: docker build --platform linux/amd64 -f Dockerfile.demo -t sentinel-demo:ci .
       - run: python scripts/check_demo_container.py --image sentinel-demo:ci --output reports/local/demo-container.json
       - if: always()
         uses: actions/upload-artifact@v4
         with:
           name: demo-container-verification
-          path: reports/local/demo-container*
+          path: |
+            reports/local/demo-container*
+            deploy/image-source.json

@@ -3,6 +3,8 @@ import pickle
 import hashlib
 import os
 import threading
+import tempfile
+from pathlib import Path
 import numpy as np
 import xgboost as xgb
 from .config import FEATURES, MODELS
@@ -99,6 +101,21 @@ def point_to(directory, version):
         if (directory / "current.json").exists()
         else {}
     )
-    tmp = directory / "pointer.tmp"
-    tmp.write_text(json.dumps({"version": version, "previous": current.get("version")}))
-    os.replace(tmp, directory / "current.json")
+    tmp = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=directory,
+            prefix=".pointer-",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
+            tmp = Path(handle.name)
+            json.dump({"version": version, "previous": current.get("version")}, handle)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(tmp, directory / "current.json")
+    finally:
+        if tmp is not None:
+            tmp.unlink(missing_ok=True)

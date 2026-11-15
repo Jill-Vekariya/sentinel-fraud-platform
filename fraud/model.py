@@ -4,10 +4,24 @@ import hashlib
 import os
 import threading
 import tempfile
+import re
 from pathlib import Path
 import numpy as np
 import xgboost as xgb
 from .config import FEATURES, MODELS
+
+
+def _version_folder(directory, version):
+    if (
+        not isinstance(version, str)
+        or re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}", version) is None
+        or version.endswith(".")
+    ):
+        raise ValueError("invalid model version")
+    folder = directory / version
+    if folder.resolve().parent != directory.resolve():
+        raise ValueError("invalid model version")
+    return folder
 
 
 class ModelManager:
@@ -21,10 +35,8 @@ class ModelManager:
         with self.lock:
             pointer = json.loads((self.directory / "current.json").read_text())
             version = pointer["version"]
+            folder = _version_folder(self.directory, version)
             if version != self.version:
-                folder = self.directory / version
-                if folder.parent != self.directory or "/" in version:
-                    raise ValueError("invalid model version")
                 meta = json.loads((folder / "metadata.json").read_text())
                 raw = (folder / "anomaly.pkl").read_bytes()
                 if hashlib.sha256(raw).hexdigest() != meta["anomaly_sha256"]:
@@ -92,9 +104,8 @@ class ModelManager:
 
 
 def point_to(directory, version):
-    if not version or "/" in version or version in (".", ".."):
-        raise ValueError("invalid model version")
-    if not (directory / version / "metadata.json").is_file():
+    folder = _version_folder(directory, version)
+    if not (folder / "metadata.json").is_file():
         raise ValueError("unknown model version")
     current = (
         json.loads((directory / "current.json").read_text())

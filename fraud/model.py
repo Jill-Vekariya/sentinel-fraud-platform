@@ -34,9 +34,11 @@ class ModelManager:
                     raise ValueError("classifier checksum mismatch")
                 clf = xgb.XGBClassifier()
                 clf.load_model(folder / "classifier.json")
-                self.clf = clf
                 # Only load locally built trusted artifacts; pickle must never accept user uploads.
-                self.anomaly = pickle.loads(raw)
+                anomaly = pickle.loads(raw)
+                # Publish only a complete candidate while holding the scoring lock.
+                self.clf = clf
+                self.anomaly = anomaly
                 self.meta = meta
                 self.version = version
             return self
